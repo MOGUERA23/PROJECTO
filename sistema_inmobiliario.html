@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InmoSystem — Sistema de Propiedades</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #1a6fc4;
+    --primary-light: #e8f2fd;
+    --primary-dark: #0e4d8f;
+    --accent: #2ecc71;
+    --accent-light: #eafaf1;
+    --danger: #e74c3c;
+    --danger-light: #fdeaea;
+    --warning: #f39c12;
+    --warning-light: #fef9e7;
+    --text: #1a1a2e;
+    --text-secondary: #555577;
+    --text-muted: #888899;
+    --border: #dde3ef;
+    --surface: #ffffff;
+    --surface-alt: #f5f7fc;
+    --surface-deep: #eef1f8;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--surface-alt); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--primary); color: white; display: flex; align-items: center; gap: 0; padding: 0; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-md); }
+  .nav-brand { padding: 0 24px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; border-right: 1px solid rgba(255,255,255,0.15); height: 56px; display: flex; align-items: center; gap: 8px; }
+  .nav-brand span { font-size: 22px; }
+  .nav-tabs { display: flex; height: 56px; overflow-x: auto; }
+  .nav-tab { padding: 0 20px; border: none; background: transparent; color: rgba(255,255,255,0.75); cursor: pointer; font-size: 14px; font-weight: 500; height: 100%; transition: all 0.2s; white-space: nowrap; border-bottom: 3px solid transparent; }
+  .nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+  .nav-tab.active { color: white; border-bottom: 3px solid #fff; background: rgba(255,255,255,0.12); }
+  .nav-badge { background: #e74c3c; color: white; border-radius: 10px; padding: 1px 6px; font-size: 11px; margin-left: 6px; }
+
+  /* LAYOUT */
+  .page { display: none; padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .card-title { font-size: 17px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { font-size: 20px; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; text-align: center; }
+  .stat-number { font-size: 32px; font-weight: 700; color: var(--primary); line-height: 1; }
+  .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+  .stat-card.green .stat-number { color: #27ae60; }
+  .stat-card.orange .stat-number { color: #e67e22; }
+  .stat-card.red .stat-number { color: var(--danger); }
+
+  /* FORMS */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  input, select, textarea { border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 13px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--surface); transition: border-color 0.2s; width: 100%; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  textarea { resize: vertical; min-height: 80px; }
+  .form-actions { margin-top: 20px; display: flex; gap: 12px; }
+
+  /* BUTTONS */
+  .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,111,196,0.3); }
+  .btn-success { background: var(--accent); color: white; }
+  .btn-success:hover { background: #27ae60; }
+  .btn-danger { background: transparent; color: var(--danger); border: 1.5px solid var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: white; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface-alt); }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: var(--surface-deep); border-bottom: 1px solid var(--border); }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface-alt); }
+  .td-actions { display: flex; gap: 6px; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .badge-green { background: var(--accent-light); color: #1e8449; }
+  .badge-blue { background: var(--primary-light); color: var(--primary-dark); }
+  .badge-orange { background: var(--warning-light); color: #884400; }
+  .badge-red { background: var(--danger-light); color: #a93226; }
+  .badge-gray { background: var(--surface-deep); color: var(--text-secondary); }
+
+  /* SEARCH BAR */
+  .search-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .search-bar input, .search-bar select { max-width: 220px; }
+
+  /* PROPERTY CARDS GRID */
+  .prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .prop-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+  .prop-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .prop-img { width: 100%; height: 170px; object-fit: cover; background: var(--surface-deep); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--text-muted); }
+  .prop-body { padding: 16px; }
+  .prop-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .prop-location { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+  .prop-price { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .prop-price span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+  .prop-meta { display: flex; gap: 14px; margin: 10px 0; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; }
+  .prop-meta-item { display: flex; align-items: center; gap: 4px; }
+  .prop-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); border-radius: 14px; padding: 36px 32px; color: white; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .hero::after { content: '🏠'; position: absolute; right: 32px; top: 50%; transform: translateY(-50%); font-size: 80px; opacity: 0.15; }
+  .hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .hero p { font-size: 15px; opacity: 0.85; max-width: 500px; }
+
+  /* CHART BARS */
+  .chart-container { margin-top: 12px; }
+  .chart-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .chart-bar-label { min-width: 100px; font-size: 13px; color: var(--text-secondary); text-align: right; }
+  .chart-bar-bg { flex: 1; background: var(--surface-deep); border-radius: 6px; height: 28px; overflow: hidden; }
+  .chart-bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; color: white; transition: width 0.8s ease; }
+  .chart-bar-val { min-width: 50px; font-size: 13px; font-weight: 600; color: var(--text); }
+
+  /* ALERT */
+  .alert { padding: 14px 18px; border-radius: var(--radius); margin-bottom: 16px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+  .alert-success { background: var(--accent-light); color: #1e8449; border: 1px solid #a9dfbf; }
+  .alert-info { background: var(--primary-light); color: var(--primary-dark); border: 1px solid #a9cce3; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+  .empty .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty p { font-size: 15px; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 14px; padding: 28px; max-width: 480px; width: 90%; box-shadow: var(--shadow-md); }
+  .modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a2e; color: white; padding: 14px 20px; border-radius: var(--radius); font-size: 14px; z-index: 999; opacity: 0; transform: translateY(20px); transition: all 0.3s; max-width: 320px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* TABS inside page */
+  .inner-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface-deep); padding: 4px; border-radius: var(--radius); width: fit-content; }
+  .inner-tab { padding: 8px 18px; border-radius: 8px; border: none; background: transparent; font-size: 14px; cursor: pointer; color: var(--text-secondary); font-family: inherit; transition: all 0.15s; }
+  .inner-tab.active { background: var(--surface); color: var(--primary); font-weight: 500; box-shadow: var(--shadow); }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid.three { grid-template-columns: 1fr; }
+    .prop-grid { grid-template-columns: 1fr; }
+    .hero::after { display: none; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand"><span>🏠</span> InmoSystem</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('inicio')">📊 Inicio</button>
+    <button class="nav-tab" onclick="showPage('propiedades')">🏘️ Propiedades</button>
+    <button class="nav-tab" onclick="showPage('usuarios')">👥 Usuarios</button>
+    <button class="nav-tab" onclick="showPage('operaciones')">📝 Operaciones</button>
+    <button class="nav-tab" onclick="showPage('reporte')">📈 Reportes</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CONTACTO -->
+<div class="modal-overlay" id="modalContacto">
+  <div class="modal">
+    <h3>📩 Contactar sobre propiedad</h3>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Propiedad</label>
+      <input type="text" id="modalPropNombre" readonly style="background:var(--surface-alt)">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Tu nombre</label>
+      <input type="text" id="modalClienteNombre" placeholder="Ej. Carlos Rodríguez">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Tu correo</label>
+      <input type="email" id="modalClienteEmail" placeholder="correo@ejemplo.com">
+    </div>
+    <div class="form-group">
+      <label>Tipo de interés</label>
+      <select id="modalTipoInteres">
+        <option value="Compra">Compra</option>
+        <option value="Arriendo">Arriendo</option>
+        <option value="Consulta">Solo consulta</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="registrarOperacion()">Registrar contacto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== INICIO ===================== -->
+<div class="page active" id="page-inicio">
+  <div class="hero">
+    <h1>Sistema de Publicación y Búsqueda de Propiedades</h1>
+    <p>Gestiona propiedades, agentes y clientes desde un solo lugar.</p>
+  </div>
+
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="stat-number" id="statProp">0</div><div class="stat-label">Propiedades publicadas</div></div>
+    <div class="stat-card green"><div class="stat-number" id="statDisp">0</div><div class="stat-label">Disponibles</div></div>
+    <div class="stat-card orange"><div class="stat-number" id="statUsuarios">0</div><div class="stat-label">Usuarios registrados</div></div>
+    <div class="stat-card red"><div class="stat-number" id="statOps">0</div><div class="stat-label">Operaciones registradas</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="icon">🕒</span> Propiedades recientes</div>
+      <button class="btn btn-primary btn-sm" onclick="showPage('propiedades')">Ver todas</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Propiedad</th><th>Tipo</th><th>Precio</th><th>Estado</th></tr></thead>
+        <tbody id="recentProps"><tr><td colspan="4"><div class="empty"><div class="empty-icon">🏠</div><p>Sin propiedades aún</p></div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PROPIEDADES ===================== -->
+<div class="page" id="page-propiedades">
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="switchInnerTab('buscar', this)">🔍 Buscar propiedades</button>
+    <button class="inner-tab" onclick="switchInnerTab('publicar', this)">➕ Publicar propiedad</button>
+    <button class="inner-tab" onclick="switchInnerTab('lista', this)">📋 Administrar</button>
+  </div>
+
+  <!-- BUSCAR -->
+  <div id="tab-buscar">
+    <div class="search-bar">
+      <input type="text" id="searchText" placeholder="🔍 Ciudad, barrio, código..." oninput="filtrarPropiedades()">
+      <select id="filterTipo" onchange="filtrarPropiedades()">
+        <option value="">Todos los tipos</option>
+        <option>Casa</option><option>Departamento</option><option>Terreno</option><option>Local comercial</option>
+      </select>
+      <select id="filterOp" onchange="filtrarPropiedades()">
+        <option value="">Venta y arriendo</option>
+        <option value="Venta">Venta</option>
+        <option value="Arriendo">Arriendo</option>
+      </select>
+      <select id="filterEstado" onchange="filtrarPropiedades()">
+        <option value="">Todos los estados</option>
+        <option value="Disponible">Disponible</option>
+        <option value="Reservada">Reservada</option>
+        <option value="Vendida">Vendida</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="limpiarFiltros()">✕ Limpiar</button>
+    </div>
+    <div class="prop-grid" id="propGrid">
+      <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏘️</div><p>No hay propiedades publicadas aún.<br>Ve a "Publicar propiedad" para agregar.</p></div>
+    </div>
+  </div>
+
+  <!-- PUBLICAR -->
+  <div id="tab-publicar" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">➕</span> Nueva propiedad</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Título / Nombre</label>
+          <input type="text" id="propTitulo" placeholder="Ej. Casa moderna en Milagro">
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="propTipo">
+            <option>Casa</option><option>Departamento</option><option>Terreno</option><option>Local comercial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Precio (USD)</label>
+          <input type="number" id="propPrecio" placeholder="80000">
+        </div>
+        <div class="form-group">
+          <label>Tipo de operación</label>
+          <select id="propOperacion">
+            <option value="Venta">Venta</option>
+            <option value="Arriendo">Arriendo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ciudad / Sector</label>
+          <input type="text" id="propCiudad" placeholder="Ej. Milagro, Guayaquil...">
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" id="propDireccion" placeholder="Calle, número, referencia">
+        </div>
+        <div class="form-group">
+          <label>Habitaciones</label>
+          <input type="number" id="propHab" placeholder="3" min="0">
+        </div>
+        <div class="form-group">
+          <label>Baños</label>
+          <input type="number" id="propBanos" placeholder="2" min="0">
+        </div>
+        <div class="form-group">
+          <label>Área (m²)</label>
+          <input type="number" id="propArea" placeholder="120">
+        </div>
+        <div class="form-group">
+          <label>Agente responsable</label>
+          <select id="propAgente"><option value="">— Seleccionar agente —</option></select>
+        </div>
+        <div class="form-group full">
+          <label>Descripción</label>
+          <textarea id="propDesc" placeholder="Describe las características, ubicación, ventajas..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="publicarPropiedad()">✅ Publicar propiedad</button>
+        <button class="btn btn-ghost" onclick="limpiarFormProp()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTA ADMIN -->
+  <div id="tab-lista" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">📋</span> Todas las propiedades</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Título</th><th>Tipo</th><th>Ciudad</th><th>Precio</th><th>Operación</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="propTable"><tr><td colspan="8"><div class="empty"><p>Sin propiedades</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== USUARIOS ===================== -->
+<div class="page" id="page-usuarios">
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="switchInnerTab('regUser', this)">➕ Registrar usuario</button>
+    <button class="inner-tab" onclick="switchInnerTab('listUser', this)">👥 Ver usuarios</button>
+  </div>
+
+  <div id="tab-regUser">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">👤</span> Registrar nuevo usuario</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="uNombre" placeholder="Ej. Ana Martínez">
+        </div>
+        <div class="form-group">
+          <label>Cédula / CI</label>
+          <input type="text" id="uCedula" placeholder="0912345678">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="uEmail" placeholder="usuario@email.com">
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" id="uTelefono" placeholder="0991234567">
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="uRol">
+            <option value="Cliente">Cliente</option>
+            <option value="Agente">Agente inmobiliario</option>
+            <option value="Administrador">Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ciudad</label>
+          <input type="text" id="uCiudad" placeholder="Ej. Guayaquil">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="registrarUsuario()">✅ Registrar usuario</button>
+        <button class="btn btn-ghost" onclick="limpiarFormUser()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-listUser" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">👥</span> Usuarios registrados</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Ciudad</th><th>Acciones</th></tr></thead>
+          <tbody id="userTable"><tr><td colspan="8"><div class="empty"><p>Sin usuarios registrados</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== OPERACIONES ===================== -->
+<div class="page" id="page-operaciones">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><span class="icon">📝</span> Historial de operaciones</div>
+    </div>
+    <div class="alert alert-info" id="opsInfo">Las operaciones se registran cuando un cliente contacta a través de una propiedad o cuando se actualiza el estado de una propiedad.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Fecha</th><th>Propiedad</th><th>Cliente</th><th>Tipo</th><th>Estado</th></tr></thead>
+        <tbody id="opsTable"><tr><td colspan="6"><div class="empty"><div class="empty-icon">📋</div><p>Sin operaciones aún</p></div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REPORTES ===================== -->
+<div class="page" id="page-reporte">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-number" id="rTotalProp">0</div><div class="stat-label">Total propiedades</div></div>
+    <div class="stat-card green"><div class="stat-number" id="rDisp">0</div><div class="stat-label">Disponibles</div></div>
+    <div class="stat-card orange"><div class="stat-number" id="rReserv">0</div><div class="stat-label">Reservadas</div></div>
+    <div class="stat-card red"><div class="stat-number" id="rVendidas">0</div><div class="stat-label">Vendidas/Arrendadas</div></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; flex-wrap:wrap;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px"><span class="icon">🏠</span> Propiedades por tipo</div>
+      <div class="chart-container" id="chartTipo"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px"><span class="icon">💰</span> Por tipo de operación</div>
+      <div class="chart-container" id="chartOp"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-title" style="margin-bottom:16px"><span class="icon">👥</span> Usuarios por rol</div>
+    <div class="chart-container" id="chartRol"></div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-title"><span class="icon">📋</span> Resumen de operaciones recientes</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Propiedad</th><th>Cliente</th><th>Tipo</th></tr></thead>
+        <tbody id="reportOpsTable"><tr><td colspan="4"><div class="empty"><p>Sin operaciones</p></div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== DATA ==========
+let propiedades = [];
+let usuarios = [];
+let operaciones = [];
+let propEditId = null;
+let contactoPropId = null;
+
+const EMOJIS = { Casa:'🏠', Departamento:'🏢', Terreno:'🌿', 'Local comercial':'🏪' };
+const COLORS_BAR = ['#1a6fc4','#2ecc71','#e67e22','#9b59b6','#e74c3c'];
+
+// ========== NAV ==========
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'reporte') actualizarReportes();
+  if (id === 'inicio') actualizarInicio();
+}
+
+function switchInnerTab(tabId, btn) {
+  const parent = btn.closest('.page');
+  parent.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+  parent.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tabId).style.display = 'block';
+  btn.classList.add('active');
+  if (tabId === 'lista') renderPropTable();
+  if (tabId === 'listUser') renderUserTable();
+  if (tabId === 'buscar') filtrarPropiedades();
+}
+
+// ========== TOAST ==========
+function toast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ========== USUARIOS ==========
+function registrarUsuario() {
+  const n = document.getElementById('uNombre').value.trim();
+  const c = document.getElementById('uCedula').value.trim();
+  const e = document.getElementById('uEmail').value.trim();
+  const tel = document.getElementById('uTelefono').value.trim();
+  const rol = document.getElementById('uRol').value;
+  const ciudad = document.getElementById('uCiudad').value.trim();
+  if (!n || !c || !e) { toast('⚠️ Completa nombre, cédula y correo'); return; }
+  if (usuarios.find(u => u.cedula === c)) { toast('⚠️ Esa cédula ya está registrada'); return; }
+  usuarios.push({ id: Date.now(), nombre: n, cedula: c, email: e, telefono: tel, rol, ciudad, fecha: new Date().toLocaleDateString('es-EC') });
+  actualizarSelectAgentes();
+  renderUserTable();
+  limpiarFormUser();
+  toast('✅ Usuario registrado correctamente');
+  actualizarInicio();
+}
+
+function limpiarFormUser() {
+  ['uNombre','uCedula','uEmail','uTelefono','uCiudad'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('uRol').value = 'Cliente';
+}
+
+function eliminarUsuario(id) {
+  if (!confirm('¿Eliminar este usuario?')) return;
+  usuarios = usuarios.filter(u => u.id !== id);
+  renderUserTable();
+  actualizarSelectAgentes();
+  actualizarInicio();
+  toast('🗑️ Usuario eliminado');
+}
+
+function renderUserTable() {
+  const tb = document.getElementById('userTable');
+  if (!usuarios.length) { tb.innerHTML = '<tr><td colspan="8"><div class="empty"><p>Sin usuarios registrados</p></div></td></tr>'; return; }
+  tb.innerHTML = usuarios.map((u, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${u.nombre}</strong></td>
+      <td>${u.cedula}</td>
+      <td>${u.email}</td>
+      <td>${u.telefono || '—'}</td>
+      <td><span class="badge ${u.rol==='Agente'?'badge-blue':u.rol==='Administrador'?'badge-red':'badge-gray'}">${u.rol}</span></td>
+      <td>${u.ciudad || '—'}</td>
+      <td class="td-actions">
+        <button class="btn btn-danger btn-sm" onclick="eliminarUsuario(${u.id})">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function actualizarSelectAgentes() {
+  const sel = document.getElementById('propAgente');
+  const agentes = usuarios.filter(u => u.rol === 'Agente' || u.rol === 'Administrador');
+  sel.innerHTML = '<option value="">— Sin asignar —</option>' + agentes.map(a => `<option value="${a.nombre}">${a.nombre}</option>`).join('');
+}
+
+// ========== PROPIEDADES ==========
+function publicarPropiedad() {
+  const titulo = document.getElementById('propTitulo').value.trim();
+  const tipo = document.getElementById('propTipo').value;
+  const precio = parseFloat(document.getElementById('propPrecio').value);
+  const operacion = document.getElementById('propOperacion').value;
+  const ciudad = document.getElementById('propCiudad').value.trim();
+  const dir = document.getElementById('propDireccion').value.trim();
+  const hab = parseInt(document.getElementById('propHab').value) || 0;
+  const ban = parseInt(document.getElementById('propBanos').value) || 0;
+  const area = parseFloat(document.getElementById('propArea').value) || 0;
+  const agente = document.getElementById('propAgente').value;
+  const desc = document.getElementById('propDesc').value.trim();
+  if (!titulo || !ciudad || !precio) { toast('⚠️ Completa al menos título, ciudad y precio'); return; }
+  if (propEditId) {
+    const idx = propiedades.findIndex(p => p.id === propEditId);
+    propiedades[idx] = { ...propiedades[idx], titulo, tipo, precio, operacion, ciudad, dir, hab, ban, area, agente, desc };
+    propEditId = null;
+    document.querySelector('#tab-publicar .btn-primary').textContent = '✅ Publicar propiedad';
+    toast('✏️ Propiedad actualizada');
+  } else {
+    propiedades.push({ id: Date.now(), titulo, tipo, precio, operacion, ciudad, dir, hab, ban, area, agente, desc, estado: 'Disponible', fecha: new Date().toLocaleDateString('es-EC') });
+    toast('✅ Propiedad publicada exitosamente');
+  }
+  limpiarFormProp();
+  filtrarPropiedades();
+  renderPropTable();
+  actualizarInicio();
+}
+
+function limpiarFormProp() {
+  ['propTitulo','propPrecio','propCiudad','propDireccion','propHab','propBanos','propArea','propDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('propTipo').value = 'Casa';
+  document.getElementById('propOperacion').value = 'Venta';
+  propEditId = null;
+  document.querySelector('#tab-publicar .btn-primary').textContent = '✅ Publicar propiedad';
+}
+
+function editarPropiedad(id) {
+  const p = propiedades.find(x => x.id === id);
+  if (!p) return;
+  propEditId = id;
+  document.getElementById('propTitulo').value = p.titulo;
+  document.getElementById('propTipo').value = p.tipo;
+  document.getElementById('propPrecio').value = p.precio;
+  document.getElementById('propOperacion').value = p.operacion;
+  document.getElementById('propCiudad').value = p.ciudad;
+  document.getElementById('propDireccion').value = p.dir;
+  document.getElementById('propHab').value = p.hab;
+  document.getElementById('propBanos').value = p.ban;
+  document.getElementById('propArea').value = p.area;
+  document.getElementById('propAgente').value = p.agente;
+  document.getElementById('propDesc').value = p.desc;
+  document.querySelector('#tab-publicar .btn-primary').textContent = '✏️ Guardar cambios';
+  switchInnerTab('publicar', document.querySelectorAll('#page-propiedades .inner-tab')[1]);
+  toast('✏️ Modo edición activado');
+}
+
+function cambiarEstado(id, estado) {
+  const p = propiedades.find(x => x.id === id);
+  if (!p) return;
+  p.estado = estado;
+  renderPropTable();
+  filtrarPropiedades();
+  actualizarInicio();
+  operaciones.push({ id: Date.now(), fecha: new Date().toLocaleDateString('es-EC'), propiedad: p.titulo, cliente: 'Sistema', tipo: 'Cambio de estado: ' + estado, estado: 'Completado' });
+  renderOpsTable();
+  toast('✅ Estado actualizado a: ' + estado);
+}
+
+function eliminarPropiedad(id) {
+  if (!confirm('¿Eliminar esta propiedad?')) return;
+  propiedades = propiedades.filter(p => p.id !== id);
+  renderPropTable();
+  filtrarPropiedades();
+  actualizarInicio();
+  toast('🗑️ Propiedad eliminada');
+}
+
+function filtrarPropiedades() {
+  const texto = (document.getElementById('searchText').value || '').toLowerCase();
+  const tipo = document.getElementById('filterTipo').value;
+  const op = document.getElementById('filterOp').value;
+  const estado = document.getElementById('filterEstado').value;
+  let lista = propiedades.filter(p => {
+    const matchText = !texto || p.titulo.toLowerCase().includes(texto) || p.ciudad.toLowerCase().includes(texto) || p.dir.toLowerCase().includes(texto);
+    const matchTipo = !tipo || p.tipo === tipo;
+    const matchOp = !op || p.operacion === op;
+    const matchEstado = !estado || p.estado === estado;
+    return matchText && matchTipo && matchOp && matchEstado;
+  });
+  renderPropGrid(lista);
+}
+
+function limpiarFiltros() {
+  document.getElementById('searchText').value = '';
+  document.getElementById('filterTipo').value = '';
+  document.getElementById('filterOp').value = '';
+  document.getElementById('filterEstado').value = '';
+  filtrarPropiedades();
+}
+
+function renderPropGrid(lista) {
+  const grid = document.getElementById('propGrid');
+  if (!lista.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>No hay propiedades que coincidan con tu búsqueda.</p></div>'; return; }
+  grid.innerHTML = lista.map(p => {
+    const estadoBadge = p.estado === 'Disponible' ? 'badge-green' : p.estado === 'Reservada' ? 'badge-orange' : 'badge-red';
+    const precioFmt = '$' + p.precio.toLocaleString('es-EC');
+    return `
+    <div class="prop-card">
+      <div class="prop-img">${EMOJIS[p.tipo] || '🏠'}</div>
+      <div class="prop-body">
+        <div class="prop-title">${p.titulo}</div>
+        <div class="prop-location">📍 ${p.ciudad}${p.dir ? ' · ' + p.dir : ''}</div>
+        <div class="prop-meta">
+          ${p.hab ? `<div class="prop-meta-item">🛏️ ${p.hab} hab</div>` : ''}
+          ${p.ban ? `<div class="prop-meta-item">🚿 ${p.ban} baños</div>` : ''}
+          ${p.area ? `<div class="prop-meta-item">📐 ${p.area} m²</div>` : ''}
+          <div class="prop-meta-item"><span class="badge badge-blue">${p.tipo}</span></div>
+        </div>
+        <div class="prop-price">${precioFmt} <span>${p.operacion === 'Arriendo' ? '/mes' : ''}</span></div>
+      </div>
+      <div class="prop-footer">
+        <span class="badge ${estadoBadge}">${p.estado}</span>
+        ${p.estado === 'Disponible' ? `<button class="btn btn-primary btn-sm" onclick="abrirModalContacto(${p.id})">📩 Contactar</button>` : `<span style="font-size:13px;color:var(--text-muted)">${p.operacion}</span>`}
+      </div>
+    </div>`}).join('');
+}
+
+function renderPropTable() {
+  const tb = document.getElementById('propTable');
+  if (!propiedades.length) { tb.innerHTML = '<tr><td colspan="8"><div class="empty"><p>Sin propiedades</p></div></td></tr>'; return; }
+  tb.innerHTML = propiedades.map((p, i) => {
+    const estadoBadge = p.estado === 'Disponible' ? 'badge-green' : p.estado === 'Reservada' ? 'badge-orange' : 'badge-red';
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${p.titulo}</strong><br><small style="color:var(--text-muted)">${p.agente ? '👤 ' + p.agente : ''}</small></td>
+      <td>${EMOJIS[p.tipo]} ${p.tipo}</td>
+      <td>${p.ciudad}</td>
+      <td><strong>$${p.precio.toLocaleString()}</strong></td>
+      <td>${p.operacion}</td>
+      <td>
+        <select class="badge ${estadoBadge}" onchange="cambiarEstado(${p.id}, this.value)" style="border:none;cursor:pointer;font-size:12px;font-weight:500;padding:3px 8px;border-radius:20px;">
+          <option ${p.estado==='Disponible'?'selected':''}>Disponible</option>
+          <option ${p.estado==='Reservada'?'selected':''}>Reservada</option>
+          <option ${p.estado==='Vendida'?'selected':''}>Vendida</option>
+        </select>
+      </td>
+      <td class="td-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editarPropiedad(${p.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarPropiedad(${p.id})">🗑️</button>
+      </td>
+    </tr>`}).join('');
+}
+
+// ========== OPERACIONES ==========
+function abrirModalContacto(propId) {
+  const p = propiedades.find(x => x.id === propId);
+  if (!p) return;
+  contactoPropId = propId;
+  document.getElementById('modalPropNombre').value = p.titulo + ' — ' + p.ciudad;
+  document.getElementById('modalClienteNombre').value = '';
+  document.getElementById('modalClienteEmail').value = '';
+  document.getElementById('modalContacto').classList.add('open');
+}
+
+function cerrarModal() {
+  document.getElementById('modalContacto').classList.remove('open');
+  contactoPropId = null;
+}
+
+function registrarOperacion() {
+  const nombre = document.getElementById('modalClienteNombre').value.trim();
+  const email = document.getElementById('modalClienteEmail').value.trim();
+  const tipo = document.getElementById('modalTipoInteres').value;
+  if (!nombre || !email) { toast('⚠️ Completa nombre y correo'); return; }
+  const p = propiedades.find(x => x.id === contactoPropId);
+  operaciones.push({ id: Date.now(), fecha: new Date().toLocaleDateString('es-EC'), propiedad: p ? p.titulo : '?', cliente: nombre, tipo, estado: 'Pendiente' });
+  cerrarModal();
+  renderOpsTable();
+  actualizarInicio();
+  toast('✅ Contacto registrado. Estado: Pendiente');
+}
+
+function renderOpsTable() {
+  const tb = document.getElementById('opsTable');
+  if (!operaciones.length) { tb.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">📋</div><p>Sin operaciones aún</p></div></td></tr>'; return; }
+  tb.innerHTML = [...operaciones].reverse().map((o, i) => `
+    <tr>
+      <td>${operaciones.length - i}</td>
+      <td>${o.fecha}</td>
+      <td>${o.propiedad}</td>
+      <td>${o.cliente}</td>
+      <td>${o.tipo}</td>
+      <td><span class="badge ${o.estado==='Completado'?'badge-green':o.estado==='Pendiente'?'badge-orange':'badge-gray'}">${o.estado}</span></td>
+    </tr>`).join('');
+}
+
+// ========== INICIO ==========
+function actualizarInicio() {
+  document.getElementById('statProp').textContent = propiedades.length;
+  document.getElementById('statDisp').textContent = propiedades.filter(p => p.estado === 'Disponible').length;
+  document.getElementById('statUsuarios').textContent = usuarios.length;
+  document.getElementById('statOps').textContent = operaciones.length;
+  const tb = document.getElementById('recentProps');
+  const recientes = [...propiedades].reverse().slice(0, 5);
+  if (!recientes.length) { tb.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="empty-icon">🏠</div><p>Sin propiedades aún</p></div></td></tr>'; return; }
+  const estadoBadge = e => e === 'Disponible' ? 'badge-green' : e === 'Reservada' ? 'badge-orange' : 'badge-red';
+  tb.innerHTML = recientes.map(p => `
+    <tr>
+      <td><strong>${p.titulo}</strong></td>
+      <td>${EMOJIS[p.tipo]} ${p.tipo}</td>
+      <td>$${p.precio.toLocaleString()}</td>
+      <td><span class="badge ${estadoBadge(p.estado)}">${p.estado}</span></td>
+    </tr>`).join('');
+}
+
+// ========== REPORTES ==========
+function actualizarReportes() {
+  document.getElementById('rTotalProp').textContent = propiedades.length;
+  document.getElementById('rDisp').textContent = propiedades.filter(p => p.estado === 'Disponible').length;
+  document.getElementById('rReserv').textContent = propiedades.filter(p => p.estado === 'Reservada').length;
+  document.getElementById('rVendidas').textContent = propiedades.filter(p => p.estado === 'Vendida').length;
+
+  // Por tipo
+  const tipos = {};
+  propiedades.forEach(p => tipos[p.tipo] = (tipos[p.tipo] || 0) + 1);
+  renderBarChart('chartTipo', tipos, '#1a6fc4');
+
+  // Por operación
+  const ops2 = {};
+  propiedades.forEach(p => ops2[p.operacion] = (ops2[p.operacion] || 0) + 1);
+  renderBarChart('chartOp', ops2, '#2ecc71');
+
+  // Por rol
+  const roles = {};
+  usuarios.forEach(u => roles[u.rol] = (roles[u.rol] || 0) + 1);
+  renderBarChart('chartRol', roles, '#9b59b6');
+
+  // Ops recientes
+  const tb2 = document.getElementById('reportOpsTable');
+  const recOps = [...operaciones].reverse().slice(0, 5);
+  if (!recOps.length) { tb2.innerHTML = '<tr><td colspan="4"><div class="empty"><p>Sin operaciones</p></div></td></tr>'; return; }
+  tb2.innerHTML = recOps.map(o => `
+    <tr><td>${o.fecha}</td><td>${o.propiedad}</td><td>${o.cliente}</td><td>${o.tipo}</td></tr>`).join('');
+}
+
+function renderBarChart(containerId, data, color) {
+  const el = document.getElementById(containerId);
+  const keys = Object.keys(data);
+  if (!keys.length) { el.innerHTML = '<div class="empty"><p>Sin datos</p></div>'; return; }
+  const max = Math.max(...Object.values(data));
+  el.innerHTML = keys.map((k, i) => {
+    const val = data[k];
+    const pct = max ? Math.round((val / max) * 100) : 0;
+    const colors = ['#1a6fc4','#2ecc71','#e67e22','#9b59b6','#e74c3c'];
+    return `
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${k}</div>
+      <div class="chart-bar-bg">
+        <div class="chart-bar-fill" style="width:${pct}%;background:${colors[i%colors.length]}">${val > 0 ? val : ''}</div>
+      </div>
+      <div class="chart-bar-val">${val}</div>
+    </div>`}).join('');
+}
+
+// ========== DATOS DEMO ==========
+function cargarDemoData() {
+  usuarios = [
+    { id: 1, nombre: 'Carlos Mendoza', cedula: '0912345678', email: 'carlos@inmo.ec', telefono: '0991234567', rol: 'Agente', ciudad: 'Guayaquil', fecha: '01/06/2026' },
+    { id: 2, nombre: 'María Torres', cedula: '0923456789', email: 'maria@inmo.ec', telefono: '0987654321', rol: 'Agente', ciudad: 'Milagro', fecha: '05/06/2026' },
+    { id: 3, nombre: 'Luis Pérez', cedula: '0934567890', email: 'luis@cliente.ec', telefono: '0976543210', rol: 'Cliente', ciudad: 'Duran', fecha: '10/06/2026' },
+  ];
+  actualizarSelectAgentes();
+  propiedades = [
+    { id: 101, titulo: 'Casa moderna en urbanización', tipo: 'Casa', precio: 95000, operacion: 'Venta', ciudad: 'Milagro', dir: 'Urb. La Arboleda, Mz 5', hab: 3, ban: 2, area: 140, agente: 'Carlos Mendoza', desc: 'Casa de dos pisos con jardín y garaje.', estado: 'Disponible', fecha: '01/06/2026' },
+    { id: 102, titulo: 'Departamento céntrico', tipo: 'Departamento', precio: 550, operacion: 'Arriendo', ciudad: 'Guayaquil', dir: 'Kennedy Norte', hab: 2, ban: 1, area: 75, agente: 'María Torres', desc: 'Departamento amoblado con vista a la ciudad.', estado: 'Disponible', fecha: '03/06/2026' },
+    { id: 103, titulo: 'Terreno en zona comercial', tipo: 'Terreno', precio: 45000, operacion: 'Venta', ciudad: 'Duran', dir: 'Av. León Febres Cordero', hab: 0, ban: 0, area: 300, agente: 'Carlos Mendoza', desc: 'Terreno plano con todos los servicios básicos.', estado: 'Reservada', fecha: '10/06/2026' },
+    { id: 104, titulo: 'Local comercial en centro', tipo: 'Local comercial', precio: 800, operacion: 'Arriendo', ciudad: 'Milagro', dir: 'Calle García Moreno', hab: 0, ban: 1, area: 60, agente: 'María Torres', desc: 'Local con vitrina y cuarto de bodega.', estado: 'Disponible', fecha: '15/06/2026' },
+    { id: 105, titulo: 'Casa familiar con piscina', tipo: 'Casa', precio: 165000, operacion: 'Venta', ciudad: 'Guayaquil', dir: 'Urb. Los Ceibos', hab: 4, ban: 3, area: 240, agente: 'Carlos Mendoza', desc: 'Exclusiva casa en urbanización cerrada.', estado: 'Disponible', fecha: '20/06/2026' },
+  ];
+  operaciones = [
+    { id: 1001, fecha: '10/06/2026', propiedad: 'Casa moderna en urbanización', cliente: 'Luis Pérez', tipo: 'Compra', estado: 'Pendiente' },
+    { id: 1002, fecha: '12/06/2026', propiedad: 'Terreno en zona comercial', cliente: 'Ana Suárez', tipo: 'Compra', estado: 'Completado' },
+  ];
+  actualizarInicio();
+  renderOpsTable();
+  filtrarPropiedades();
+  renderPropTable();
+  renderUserTable();
+}
+
+cargarDemoData();
+</script>
+</body>
+</html>

@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InmoSystem Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#16a34a;--primary-dark:#14532d;--primary-light:#dcfce7;--primary-mid:#22c55e;
+  --accent:#0ea5e9;--accent-light:#e0f2fe;
+  --gold:#f59e0b;--gold-light:#fef3c7;
+  --danger:#ef4444;--danger-light:#fee2e2;
+  --text:#111827;--text2:#4b5563;--text3:#9ca3af;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --surface:#fff;--surf1:#f9fafb;--surf2:#f3f4f6;
+  --radius:10px;--shadow:0 1px 8px rgba(0,0,0,0.08);--shadow-md:0 4px 20px rgba(0,0,0,0.12);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--surf1);color:var(--text);min-height:100vh}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,#14532d 0%,#16a34a 60%,#22c55e 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#fff;border-radius:18px;padding:40px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .logo-icon{font-size:48px}
+.login-logo h1{font-size:22px;font-weight:700;color:var(--primary-dark);margin-top:8px}
+.login-logo p{font-size:13px;color:var(--text3);margin-top:4px}
+.login-group{margin-bottom:16px}
+.login-group label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.login-group input{width:100%;border:1.5px solid var(--border2);border-radius:8px;padding:11px 14px;font-size:14px;font-family:inherit;transition:border-color .2s}
+.login-group input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.login-err{background:var(--danger-light);color:#b91c1c;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+.login-hint{background:var(--primary-light);color:var(--primary-dark);border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:16px}
+.btn-login{width:100%;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}
+.btn-login:hover{background:var(--primary-dark)}
+
+/* NAV */
+nav{background:var(--primary-dark);color:#fff;display:flex;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-md)}
+.nav-brand{padding:0 20px;font-size:18px;font-weight:700;border-right:1px solid rgba(255,255,255,0.15);height:54px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.nav-tabs{display:flex;height:54px;overflow-x:auto;flex:1}
+.nav-tab{padding:0 16px;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;font-size:13px;font-weight:500;height:100%;transition:all .2s;white-space:nowrap;border-bottom:3px solid transparent;font-family:inherit}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-tab.active{color:#fff;border-bottom:3px solid #4ade80;background:rgba(255,255,255,0.1)}
+.nav-right{padding:0 16px;display:flex;align-items:center;gap:10px;border-left:1px solid rgba(255,255,255,0.15)}
+.nav-user{font-size:13px;color:rgba(255,255,255,0.85)}
+.btn-logout{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-logout:hover{background:rgba(255,255,255,0.25)}
+
+/* PAGES */
+.page{display:none;padding:24px 20px;max-width:1120px;margin:0 auto}
+.page.active{display:block}
+
+/* INNER TABS */
+.inner-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surf2);padding:4px;border-radius:var(--radius);width:fit-content}
+.inner-tab{padding:7px 16px;border-radius:8px;border:none;background:transparent;font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .15s}
+.inner-tab.active{background:var(--surface);color:var(--primary-dark);font-weight:500;box-shadow:var(--shadow)}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:22px;margin-bottom:18px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+.stat-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:18px;text-align:center}
+.stat-number{font-size:30px;font-weight:700;line-height:1}
+.stat-label{font-size:12px;color:var(--text3);margin-top:5px}
+.stat-card.g .stat-number{color:var(--primary)}
+.stat-card.b .stat-number{color:var(--accent)}
+.stat-card.o .stat-number{color:var(--gold)}
+.stat-card.r .stat-number{color:var(--danger)}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+label{font-size:12px;font-weight:500;color:var(--text2)}
+input,select,textarea{border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);transition:border-color .2s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+textarea{resize:vertical;min-height:75px}
+.form-actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border2)}
+.btn-ghost:hover{background:var(--surf2)}
+.btn-danger{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{background:#d97706}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:#0284c7}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;background:var(--surf2);border-bottom:1px solid var(--border)}
+td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf1)}
+.td-actions{display:flex;gap:5px;flex-wrap:wrap}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.b-green{background:var(--primary-light);color:#14532d}
+.b-blue{background:var(--accent-light);color:#0369a1}
+.b-gold{background:var(--gold-light);color:#92400e}
+.b-red{background:var(--danger-light);color:#991b1b}
+.b-gray{background:var(--surf2);color:var(--text2)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#14532d 0%,#16a34a 100%);border-radius:14px;padding:32px 28px;color:#fff;margin-bottom:22px;position:relative;overflow:hidden}
+.hero::after{content:'🏡';position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:72px;opacity:.15}
+.hero h1{font-size:24px;font-weight:700;margin-bottom:6px}
+.hero p{font-size:14px;opacity:.85;max-width:480px}
+.hero-role{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:12px;margin-bottom:10px}
+
+/* PROPERTY GRID */
+.prop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.prop-card{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .2s;position:relative}
+.prop-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.prop-card.favorito::before{content:'⭐';position:absolute;top:10px;left:10px;background:var(--gold);color:#fff;border-radius:20px;padding:3px 10px;font-size:12px;z-index:2}
+.prop-card.comparando{border:2px solid var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.prop-img{width:100%;height:160px;object-fit:cover;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--text3);position:relative}
+.prop-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.prop-body{padding:14px}
+.prop-title{font-weight:600;font-size:14px;margin-bottom:3px}
+.prop-loc{font-size:12px;color:var(--text3);margin-bottom:8px}
+.prop-price{font-size:20px;font-weight:700;color:var(--primary)}
+.prop-price span{font-size:12px;font-weight:400;color:var(--text3)}
+.prop-meta{display:flex;gap:10px;margin:8px 0;font-size:12px;color:var(--text2);flex-wrap:wrap}
+.prop-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.search-bar input,.search-bar select{max-width:200px}
+
+/* CHART */
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.chart-bar-label{min-width:110px;font-size:12px;color:var(--text2);text-align:right}
+.chart-bar-bg{flex:1;background:var(--surf2);border-radius:6px;height:26px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:600;color:#fff;transition:width .8s ease;min-width:2px}
+.chart-bar-val{min-width:32px;font-size:12px;font-weight:600;color:var(--text)}
+
+/* MAP placeholder */
+.map-box{background:var(--surf2);border-radius:10px;border:1px solid var(--border);height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:10px;font-size:14px;margin-top:12px}
+.map-box .map-icon{font-size:40px}
+.map-pin-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;width:100%;padding:0 16px}
+.map-pin{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;display:flex;align-items:center;gap:8px}
+.map-pin .dot{width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0}
+
+/* COMPARE */
+.compare-panel{background:var(--accent-light);border:1px solid #bae6fd;border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;display:none}
+.compare-panel.open{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.compare-title{font-weight:600;font-size:14px;color:#0369a1}
+.compare-items{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.compare-chip{background:#fff;border:1px solid #bae6fd;border-radius:20px;padding:4px 12px;font-size:12px;color:#0369a1;display:flex;align-items:center;gap:6px}
+.compare-chip button{background:none;border:none;cursor:pointer;color:#0369a1;font-size:14px;line-height:1}
+
+/* COMPARE TABLE */
+.compare-table-wrap{overflow-x:auto;margin-top:18px}
+.compare-table{border-collapse:collapse;width:100%;min-width:400px}
+.compare-table th{background:var(--primary-dark);color:#fff;padding:10px 14px;font-size:12px;font-weight:600;text-align:left}
+.compare-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.compare-table tr:nth-child(even) td{background:var(--surf1)}
+.compare-table .field-label{font-weight:500;color:var(--text2);background:var(--surf2)!important}
+
+/* FAV */
+.fav-empty{text-align:center;padding:40px;color:var(--text3)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;padding:26px;max-width:460px;width:92%;box-shadow:var(--shadow-md);max-height:90vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:14px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;padding:12px 18px;border-radius:var(--radius);font-size:13px;z-index:999;opacity:0;transform:translateY(16px);transition:all .3s;max-width:300px}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* IMAGE UPLOAD */
+.img-upload-area{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surf1)}
+.img-upload-area:hover{border-color:var(--primary);background:var(--primary-light)}
+.img-upload-area.has-img{border-style:solid;border-color:var(--primary)}
+.img-preview{max-width:100%;max-height:140px;border-radius:8px;margin-top:8px;object-fit:cover}
+.img-upload-label{font-size:13px;color:var(--text3);margin-top:6px}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty .empty-icon{font-size:40px;margin-bottom:10px}
+.empty p{font-size:14px}
+
+/* DETAIL VIEW */
+.prop-detail{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:18px;display:none}
+.prop-detail.open{display:block}
+.detail-img{width:100%;height:240px;object-fit:cover;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:64px;color:var(--text3);position:relative}
+.detail-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.detail-body{padding:20px}
+.detail-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.detail-price{font-size:26px;font-weight:700;color:var(--primary);margin:8px 0}
+.detail-meta{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:14px 0}
+.detail-meta-item{background:var(--surf1);border-radius:8px;padding:10px;text-align:center}
+.detail-meta-item .val{font-size:18px;font-weight:700;color:var(--primary-dark)}
+.detail-meta-item .lbl{font-size:11px;color:var(--text3);margin-top:2px}
+
+@media(max-width:600px){
+  .form-grid,.form-grid.three{grid-template-columns:1fr}
+  .prop-grid{grid-template-columns:1fr}
+  .hero::after{display:none}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .search-bar input,.search-bar select{max-width:100%;width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">🏡</div>
+      <h1>InmoSystem Pro</h1>
+      <p>Sistema de Publicación y Búsqueda de Propiedades</p>
+    </div>
+    <div class="login-hint">
+      <strong>Cuentas de prueba:</strong><br>
+      Admin: admin@inmo.ec / admin123<br>
+      Agente: carlos@inmo.ec / agente123<br>
+      Cliente: luis@inmo.ec / cliente123
+    </div>
+    <div class="login-err" id="loginErr">Correo o contraseña incorrectos.</div>
+    <div class="login-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="loginEmail" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-group">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Ingresar al sistema</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CONTACTO -->
+<div class="modal-overlay" id="modalContacto">
+  <div class="modal">
+    <h3>📩 Registrar contacto</h3>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Propiedad</label>
+      <input type="text" id="modalPropNombre" readonly style="background:var(--surf2)">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Nombre del cliente</label>
+      <input type="text" id="modalClienteNombre" placeholder="Nombre completo">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Correo del cliente</label>
+      <input type="email" id="modalClienteEmail" placeholder="correo@email.com">
+    </div>
+    <div class="form-group">
+      <label>Tipo de interés</label>
+      <select id="modalTipoInteres">
+        <option value="Compra">Compra</option>
+        <option value="Arriendo">Arriendo</option>
+        <option value="Consulta">Solo consulta</option>
+        <option value="Visita">Solicitar visita</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalContacto')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="registrarOperacion()">✅ Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMPARE -->
+<div class="modal-overlay" id="modalCompare">
+  <div class="modal" style="max-width:700px">
+    <h3>📊 Comparar propiedades</h3>
+    <div class="compare-table-wrap" id="compareTableContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalCompare')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🏡 InmoSystem</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('inicio',this)">📊 Inicio</button>
+    <button class="nav-tab" onclick="showPage('propiedades',this)">🏘️ Propiedades</button>
+    <button class="nav-tab" onclick="showPage('favoritos',this)">⭐ Favoritos</button>
+    <button class="nav-tab" onclick="showPage('usuarios',this)">👥 Usuarios</button>
+    <button class="nav-tab" onclick="showPage('operaciones',this)">📋 Operaciones</button>
+    <button class="nav-tab" onclick="showPage('mapa',this)">🗺️ Mapa</button>
+    <button class="nav-tab" onclick="showPage('reporte',this)">📈 Reportes</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-user" id="navUser"></span>
+    <button class="btn-logout" onclick="doLogout()">Salir</button>
+  </div>
+</nav>
+
+<!-- ===== INICIO ===== -->
+<div class="page active" id="page-inicio">
+  <div class="hero">
+    <div class="hero-role" id="heroRole"></div>
+    <h1>Bienvenido, <span id="heroNombre"></span></h1>
+    <p>Administra propiedades, usuarios y operaciones desde un solo lugar.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card g"><div class="stat-number" id="s1">0</div><div class="stat-label">Propiedades</div></div>
+    <div class="stat-card b"><div class="stat-number" id="s2">0</div><div class="stat-label">Disponibles</div></div>
+    <div class="stat-card o"><div class="stat-number" id="s3">0</div><div class="stat-label">Usuarios</div></div>
+    <div class="stat-card r"><div class="stat-number" id="s4">0</div><div class="stat-label">Operaciones</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🕒 Propiedades recientes</div>
+      <button class="btn btn-primary btn-sm" onclick="showPage('propiedades',null)">Ver todas</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Propiedad</th><th>Tipo</th><th>Precio</th><th>Estado</th></tr></thead>
+        <tbody id="recentProps"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROPIEDADES ===== -->
+<div class="page" id="page-propiedades">
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="switchTab('buscar',this,'page-propiedades')">🔍 Buscar</button>
+    <button class="inner-tab" onclick="switchTab('publicar',this,'page-propiedades')" id="tabPublicarBtn">➕ Publicar</button>
+    <button class="inner-tab" onclick="switchTab('admin',this,'page-propiedades')" id="tabAdminBtn">⚙️ Administrar</button>
+  </div>
+
+  <!-- BUSCAR -->
+  <div id="tab-buscar">
+    <!-- Compare panel -->
+    <div class="compare-panel" id="comparePanel">
+      <span class="compare-title">📊 Comparando:</span>
+      <div class="compare-items" id="compareItems"></div>
+      <button class="btn btn-accent btn-sm" onclick="mostrarComparacion()">Ver comparación</button>
+      <button class="btn btn-ghost btn-sm" onclick="limpiarCompare()">Limpiar</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchText" placeholder="🔍 Ciudad, nombre..." oninput="filtrarProps()">
+      <select id="fTipo" onchange="filtrarProps()">
+        <option value="">Todos los tipos</option>
+        <option>Casa</option><option>Departamento</option><option>Terreno</option><option>Local comercial</option>
+      </select>
+      <select id="fOp" onchange="filtrarProps()">
+        <option value="">Venta y arriendo</option>
+        <option value="Venta">Venta</option>
+        <option value="Arriendo">Arriendo</option>
+      </select>
+      <select id="fEstado" onchange="filtrarProps()">
+        <option value="">Todos los estados</option>
+        <option value="Disponible">Disponible</option>
+        <option value="Reservada">Reservada</option>
+        <option value="Vendida">Vendida</option>
+      </select>
+      <input type="number" id="fPrecioMax" placeholder="Precio máx $" oninput="filtrarProps()" style="max-width:140px">
+      <button class="btn btn-ghost btn-sm" onclick="limpiarFiltros()">✕ Limpiar</button>
+    </div>
+
+    <!-- Detalle expandido -->
+    <div class="prop-detail" id="propDetail">
+      <div class="detail-img" id="detailImg"><span id="detailEmoji"></span></div>
+      <div class="detail-body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div class="detail-title" id="detailTitulo"></div>
+            <div style="font-size:13px;color:var(--text3)" id="detailLoc"></div>
+          </div>
+          <div>
+            <div class="detail-price" id="detailPrecio"></div>
+            <span class="badge" id="detailEstadoBadge"></span>
+          </div>
+        </div>
+        <div class="detail-meta" id="detailMeta"></div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.6" id="detailDesc"></div>
+        <div style="font-size:13px;color:var(--text3);margin-top:8px" id="detailAgente"></div>
+        <div class="form-actions" style="margin-top:16px">
+          <button class="btn btn-primary btn-sm" id="detailContactBtn">📩 Contactar</button>
+          <button class="btn btn-ghost btn-sm" id="detailFavBtn"></button>
+          <button class="btn btn-ghost btn-sm" onclick="cerrarDetalle()">✕ Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-grid" id="propGrid"></div>
+  </div>
+
+  <!-- PUBLICAR -->
+  <div id="tab-publicar" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="formPropTitle">➕ Nueva propiedad</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" id="pTitulo" placeholder="Ej. Casa moderna en Milagro">
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="pTipo"><option>Casa</option><option>Departamento</option><option>Terreno</option><option>Local comercial</option></select>
+        </div>
+        <div class="form-group">
+          <label>Precio (USD)</label>
+          <input type="number" id="pPrecio" placeholder="80000">
+        </div>
+        <div class="form-group">
+          <label>Tipo de operación</label>
+          <select id="pOp"><option value="Venta">Venta</option><option value="Arriendo">Arriendo</option></select>
+        </div>
+        <div class="form-group">
+          <label>Ciudad / Sector</label>
+          <input type="text" id="pCiudad" placeholder="Ej. Milagro">
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" id="pDir" placeholder="Calle, número, referencia">
+        </div>
+        <div class="form-group">
+          <label>Habitaciones</label>
+          <input type="number" id="pHab" placeholder="3" min="0">
+        </div>
+        <div class="form-group">
+          <label>Baños</label>
+          <input type="number" id="pBan" placeholder="2" min="0">
+        </div>
+        <div class="form-group">
+          <label>Área (m²)</label>
+          <input type="number" id="pArea" placeholder="120">
+        </div>
+        <div class="form-group">
+          <label>Agente responsable</label>
+          <select id="pAgente"><option value="">— Sin asignar —</option></select>
+        </div>
+        <div class="form-group full">
+          <label>Descripción</label>
+          <textarea id="pDesc" placeholder="Describe las características, ubicación, ventajas..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Foto de la propiedad</label>
+          <div class="img-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size:28px">📷</div>
+            <div class="img-upload-label">Haz clic para subir una foto desde tu computadora</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">JPG, PNG — máx 5MB</div>
+            <img id="imgPreview" class="img-preview" style="display:none">
+          </div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImg(this)">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="publicarProp()">✅ Publicar propiedad</button>
+        <button class="btn btn-ghost" onclick="limpiarFormProp()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="tab-admin" style="display:none">
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚙️ Administrar propiedades</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Título</th><th>Tipo</th><th>Ciudad</th><th>Precio</th><th>Op.</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="propTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FAVORITOS ===== -->
+<div class="page" id="page-favoritos">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">⭐ Mis propiedades favoritas</div>
+    </div>
+    <div class="prop-grid" id="favGrid"></div>
+  </div>
+</div>
+
+<!-- ===== USUARIOS ===== -->
+<div class="page" id="page-usuarios">
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="switchTab('regUser',this,'page-usuarios')">➕ Registrar</button>
+    <button class="inner-tab" onclick="switchTab('listUser',this,'page-usuarios')">👥 Ver usuarios</button>
+  </div>
+  <div id="tab-regUser">
+    <div class="card">
+      <div class="card-header"><div class="card-title">👤 Registrar usuario</div></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Nombre completo</label><input type="text" id="uNombre" placeholder="Ana Martínez"></div>
+        <div class="form-group"><label>Cédula / CI</label><input type="text" id="uCedula" placeholder="0912345678"></div>
+        <div class="form-group"><label>Correo electrónico</label><input type="email" id="uEmail" placeholder="usuario@email.com"></div>
+        <div class="form-group"><label>Contraseña</label><input type="password" id="uPass" placeholder="mínimo 6 caracteres"></div>
+        <div class="form-group"><label>Teléfono</label><input type="text" id="uTel" placeholder="0991234567"></div>
+        <div class="form-group"><label>Ciudad</label><input type="text" id="uCiudad" placeholder="Guayaquil"></div>
+        <div class="form-group"><label>Rol</label>
+          <select id="uRol"><option value="Cliente">Cliente</option><option value="Agente">Agente inmobiliario</option><option value="Administrador">Administrador</option></select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="registrarUser()">✅ Registrar usuario</button>
+        <button class="btn btn-ghost" onclick="limpiarFormUser()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+  <div id="tab-listUser" style="display:none">
+    <div class="card">
+      <div class="card-header"><div class="card-title">👥 Usuarios registrados</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Ciudad</th><th>Acciones</th></tr></thead>
+          <tbody id="userTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OPERACIONES ===== -->
+<div class="page" id="page-operaciones">
+  <div class="card">
+    <div class="card-header"><div class="card-title">📋 Historial de operaciones</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Fecha</th><th>Propiedad</th><th>Cliente</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="opsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAPA ===== -->
+<div class="page" id="page-mapa">
+  <div class="card">
+    <div class="card-header"><div class="card-title">🗺️ Ubicación de propiedades</div></div>
+    <div class="map-box">
+      <div class="map-icon">🗺️</div>
+      <div style="font-weight:600;color:var(--text2)">Mapa de propiedades</div>
+      <div style="font-size:12px;text-align:center;max-width:320px">Para usar un mapa interactivo real necesitas conexión a internet y una API key de Google Maps. Esta es la lista de ubicaciones registradas:</div>
+    </div>
+    <div class="map-pin-list" id="mapPins" style="margin-top:0"></div>
+  </div>
+</div>
+
+<!-- ===== REPORTES ===== -->
+<div class="page" id="page-reporte">
+  <div class="stats-row">
+    <div class="stat-card g"><div class="stat-number" id="rTotal">0</div><div class="stat-label">Total propiedades</div></div>
+    <div class="stat-card b"><div class="stat-number" id="rDisp">0</div><div class="stat-label">Disponibles</div></div>
+    <div class="stat-card o"><div class="stat-number" id="rReserv">0</div><div class="stat-label">Reservadas</div></div>
+    <div class="stat-card r"><div class="stat-number" id="rVend">0</div><div class="stat-label">Vendidas</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div class="card"><div class="card-title" style="margin-bottom:14px">🏠 Por tipo</div><div id="chartTipo"></div></div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px">💰 Por operación</div><div id="chartOp"></div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><div class="card-title" style="margin-bottom:14px">👥 Usuarios por rol</div><div id="chartRol"></div></div>
+  <div class="card" style="margin-top:18px">
+    <div class="card-header"><div class="card-title">📋 Operaciones recientes</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Propiedad</th><th>Cliente</th><th>Tipo</th><th>Estado</th></tr></thead>
+        <tbody id="reportOps"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let props=[],users=[],ops=[],favs=[],compareList=[];
+let currentUser=null,propEditId=null,contactPropId=null,imgBase64='';
+const EMOJIS={Casa:'🏠',Departamento:'🏢',Terreno:'🌿','Local comercial':'🏪'};
+const BAR_COLORS=['#16a34a','#0ea5e9','#f59e0b','#8b5cf6','#ef4444'];
+
+const ACCOUNTS=[
+  {id:1,nombre:'Admin Sistema',email:'admin@inmo.ec',pass:'admin123',rol:'Administrador',cedula:'0000000001',telefono:'000000',ciudad:'Milagro'},
+  {id:2,nombre:'Carlos Mendoza',email:'carlos@inmo.ec',pass:'agente123',rol:'Agente',cedula:'0912345678',telefono:'0991234567',ciudad:'Guayaquil'},
+  {id:3,nombre:'Luis Pérez',email:'luis@inmo.ec',pass:'cliente123',rol:'Cliente',cedula:'0934567890',telefono:'0976543210',ciudad:'Durán'},
+];
+
+// ===== LOGIN =====
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const acc=ACCOUNTS.find(a=>a.email===email&&a.pass===pass)||users.find(u=>u.email===email&&u.pass===pass);
+  if(!acc){document.getElementById('loginErr').style.display='block';return;}
+  document.getElementById('loginErr').style.display='none';
+  currentUser=acc;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('navUser').textContent=acc.nombre+' ('+acc.rol+')';
+  document.getElementById('heroNombre').textContent=acc.nombre.split(' ')[0];
+  document.getElementById('heroRole').textContent=acc.rol;
+  // Permisos
+  const isAdmin=acc.rol==='Administrador'||acc.rol==='Agente';
+  document.getElementById('tabPublicarBtn').style.display=isAdmin?'':'none';
+  document.getElementById('tabAdminBtn').style.display=isAdmin?'':'none';
+  actualizarInicio();
+  filtrarProps();
+}
+function doLogout(){
+  currentUser=null;
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPass').value='';
+}
+
+// ===== NAV =====
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  else document.querySelectorAll('.nav-tab').forEach(t=>{if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+id+"'"))t.classList.add('active')});
+  if(id==='reporte')actualizarReportes();
+  if(id==='inicio')actualizarInicio();
+  if(id==='favoritos')renderFavs();
+  if(id==='mapa')renderMapa();
+  if(id==='operaciones')renderOps();
+}
+
+function switchTab(tabId,btn,pageId){
+  const page=document.getElementById(pageId);
+  page.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  page.querySelectorAll('.inner-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+tabId).style.display='block';
+  btn.classList.add('active');
+  if(tabId==='admin')renderPropTable();
+  if(tabId==='listUser')renderUserTable();
+  if(tabId==='buscar')filtrarProps();
+}
+
+// ===== TOAST =====
+function toast(msg,dur=3000){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+// ===== MODAL =====
+function cerrarModal(id){document.getElementById(id).classList.remove('open')}
+
+// ===== IMAGE =====
+function previewImg(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>5*1024*1024){toast('⚠️ La imagen es muy grande (máx 5MB)');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    imgBase64=e.target.result;
+    const prev=document.getElementById('imgPreview');
+    prev.src=imgBase64;prev.style.display='block';
+    document.getElementById('uploadArea').classList.add('has-img');
+    document.querySelector('.img-upload-label').textContent='Foto cargada ✅';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== USUARIOS =====
+function registrarUser(){
+  const n=document.getElementById('uNombre').value.trim();
+  const c=document.getElementById('uCedula').value.trim();
+  const e=document.getElementById('uEmail').value.trim();
+  const p=document.getElementById('uPass').value;
+  const tel=document.getElementById('uTel').value.trim();
+  const ciudad=document.getElementById('uCiudad').value.trim();
+  const rol=document.getElementById('uRol').value;
+  if(!n||!c||!e||!p){toast('⚠️ Completa nombre, cédula, correo y contraseña');return;}
+  if(p.length<6){toast('⚠️ La contraseña debe tener mínimo 6 caracteres');return;}
+  if(users.find(u=>u.cedula===c)||ACCOUNTS.find(u=>u.cedula===c)){toast('⚠️ Esa cédula ya está registrada');return;}
+  users.push({id:Date.now(),nombre:n,cedula:c,email:e,pass:p,telefono:tel,ciudad,rol,fecha:new Date().toLocaleDateString('es-EC')});
+  actualizarSelectAgentes();renderUserTable();limpiarFormUser();
+  toast('✅ Usuario registrado. Ya puede iniciar sesión.');actualizarInicio();
+}
+function limpiarFormUser(){
+  ['uNombre','uCedula','uEmail','uPass','uTel','uCiudad'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('uRol').value='Cliente';
+}
+function eliminarUser(id){
+  if(!confirm('¿Eliminar usuario?'))return;
+  users=users.filter(u=>u.id!==id);renderUserTable();actualizarSelectAgentes();actualizarInicio();toast('🗑️ Usuario eliminado');
+}
+function renderUserTable(){
+  const tb=document.getElementById('userTable');
+  const allUsers=[...ACCOUNTS,...users];
+  if(!allUsers.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><p>Sin usuarios</p></div></td></tr>';return;}
+  tb.innerHTML=allUsers.map((u,i)=>`
+    <tr>
+      <td>${i+1}</td><td><strong>${u.nombre}</strong></td><td>${u.cedula}</td><td>${u.email}</td>
+      <td>${u.telefono||'—'}</td>
+      <td><span class="badge ${u.rol==='Agente'?'b-blue':u.rol==='Administrador'?'b-red':'b-gray'}">${u.rol}</span></td>
+      <td>${u.ciudad||'—'}</td>
+      <td class="td-actions">${!ACCOUNTS.find(a=>a.id===u.id)?`<button class="btn btn-danger btn-sm" onclick="eliminarUser(${u.id})">🗑️</button>`:'<span style="font-size:11px;color:var(--text3)">Cuenta base</span>'}</td>
+    </tr>`).join('');
+}
+function actualizarSelectAgentes(){
+  const sel=document.getElementById('pAgente');
+  const all=[...ACCOUNTS,...users].filter(u=>u.rol==='Agente'||u.rol==='Administrador');
+  sel.innerHTML='<option value="">— Sin asignar —</option>'+all.map(a=>`<option value="${a.nombre}">${a.nombre}</option>`).join('');
+}
+
+// ===== PROPIEDADES =====
+function publicarProp(){
+  const titulo=document.getElementById('pTitulo').value.trim();
+  const tipo=document.getElementById('pTipo').value;
+  const precio=parseFloat(document.getElementById('pPrecio').value);
+  const op=document.getElementById('pOp').value;
+  const ciudad=document.getElementById('pCiudad').value.trim();
+  const dir=document.getElementById('pDir').value.trim();
+  const hab=parseInt(document.getElementById('pHab').value)||0;
+  const ban=parseInt(document.getElementById('pBan').value)||0;
+  const area=parseFloat(document.getElementById('pArea').value)||0;
+  const agente=document.getElementById('pAgente').value;
+  const desc=document.getElementById('pDesc').value.trim();
+  if(!titulo||!ciudad||!precio){toast('⚠️ Completa al menos título, ciudad y precio');return;}
+  if(propEditId){
+    const idx=props.findIndex(p=>p.id===propEditId);
+    props[idx]={...props[idx],titulo,tipo,precio,op,ciudad,dir,hab,ban,area,agente,desc,img:imgBase64||props[idx].img};
+    propEditId=null;imgBase64='';
+    document.getElementById('formPropTitle').textContent='➕ Nueva propiedad';
+    document.querySelector('#tab-publicar .btn-primary').textContent='✅ Publicar propiedad';
+    toast('✏️ Propiedad actualizada');
+  } else {
+    props.push({id:Date.now(),titulo,tipo,precio,op,ciudad,dir,hab,ban,area,agente,desc,img:imgBase64,estado:'Disponible',fecha:new Date().toLocaleDateString('es-EC')});
+    toast('✅ Propiedad publicada');
+  }
+  limpiarFormProp();filtrarProps();renderPropTable();actualizarInicio();
+}
+function limpiarFormProp(){
+  ['pTitulo','pPrecio','pCiudad','pDir','pHab','pBan','pArea','pDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pTipo').value='Casa';document.getElementById('pOp').value='Venta';
+  document.getElementById('imgPreview').style.display='none';
+  document.getElementById('uploadArea').classList.remove('has-img');
+  document.querySelector('.img-upload-label').textContent='Haz clic para subir una foto desde tu computadora';
+  document.getElementById('fileInput').value='';imgBase64='';propEditId=null;
+}
+function editarProp(id){
+  const p=props.find(x=>x.id===id);if(!p)return;
+  propEditId=id;imgBase64=p.img||'';
+  document.getElementById('pTitulo').value=p.titulo;
+  document.getElementById('pTipo').value=p.tipo;
+  document.getElementById('pPrecio').value=p.precio;
+  document.getElementById('pOp').value=p.op;
+  document.getElementById('pCiudad').value=p.ciudad;
+  document.getElementById('pDir').value=p.dir;
+  document.getElementById('pHab').value=p.hab;
+  document.getElementById('pBan').value=p.ban;
+  document.getElementById('pArea').value=p.area;
+  document.getElementById('pAgente').value=p.agente;
+  document.getElementById('pDesc').value=p.desc;
+  if(p.img){const prev=document.getElementById('imgPreview');prev.src=p.img;prev.style.display='block';document.getElementById('uploadArea').classList.add('has-img');document.querySelector('.img-upload-label').textContent='Foto actual';}
+  document.getElementById('formPropTitle').textContent='✏️ Editar propiedad';
+  document.querySelector('#tab-publicar .btn-primary').textContent='✏️ Guardar cambios';
+  switchTab('publicar',document.querySelectorAll('#page-propiedades .inner-tab')[1],'page-propiedades');
+  toast('✏️ Modo edición');
+}
+function eliminarProp(id){
+  if(!confirm('¿Eliminar esta propiedad?'))return;
+  props=props.filter(p=>p.id!==id);favs=favs.filter(f=>f!==id);compareList=compareList.filter(c=>c!==id);
+  filtrarProps();renderPropTable();actualizarInicio();updateComparePanel();renderFavs();toast('🗑️ Propiedad eliminada');
+}
+function cambiarEstado(id,estado){
+  const p=props.find(x=>x.id===id);if(!p)return;p.estado=estado;
+  renderPropTable();filtrarProps();actualizarInicio();
+  ops.push({id:Date.now(),fecha:new Date().toLocaleDateString('es-EC'),propiedad:p.titulo,cliente:'Sistema',tipo:'Cambio de estado: '+estado,estado:'Completado'});
+  renderOps();toast('✅ Estado: '+estado);
+}
+
+// ===== FILTRO =====
+function filtrarProps(){
+  const texto=(document.getElementById('searchText').value||'').toLowerCase();
+  const tipo=document.getElementById('fTipo').value;
+  const op=document.getElementById('fOp').value;
+  const estado=document.getElementById('fEstado').value;
+  const maxPrecio=parseFloat(document.getElementById('fPrecioMax').value)||Infinity;
+  const lista=props.filter(p=>{
+    return (!texto||p.titulo.toLowerCase().includes(texto)||p.ciudad.toLowerCase().includes(texto))
+      &&(!tipo||p.tipo===tipo)&&(!op||p.op===op)&&(!estado||p.estado===estado)&&p.precio<=maxPrecio;
+  });
+  renderPropGrid(lista);
+}
+function limpiarFiltros(){
+  ['searchText','fPrecioMax'].forEach(id=>document.getElementById(id).value='');
+  ['fTipo','fOp','fEstado'].forEach(id=>document.getElementById(id).value='');
+  filtrarProps();
+}
+
+// ===== RENDER GRID =====
+function renderPropGrid(lista){
+  const grid=document.getElementById('propGrid');
+  if(!lista.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>No hay propiedades que coincidan.</p></div>';return;}
+  grid.innerHTML=lista.map(p=>{
+    const esBadge=p.estado==='Disponible'?'b-green':p.estado==='Reservada'?'b-gold':'b-red';
+    const isFav=favs.includes(p.id);const isCmp=compareList.includes(p.id);
+    const imgContent=p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" alt="foto">`:`<span style="font-size:44px">${EMOJIS[p.tipo]||'🏠'}</span>`;
+    return `<div class="prop-card${isFav?' favorito':''}${isCmp?' comparando':''}" id="pcard-${p.id}">
+      <div class="prop-img" style="position:relative">${imgContent}</div>
+      <div class="prop-body">
+        <div class="prop-title">${p.titulo}</div>
+        <div class="prop-loc">📍 ${p.ciudad}${p.dir?' · '+p.dir:''}</div>
+        <div class="prop-meta">
+          ${p.hab?`<span>🛏️ ${p.hab}</span>`:''}
+          ${p.ban?`<span>🚿 ${p.ban}</span>`:''}
+          ${p.area?`<span>📐 ${p.area}m²</span>`:''}
+          <span class="badge b-blue">${p.tipo}</span>
+        </div>
+        <div class="prop-price">$${p.precio.toLocaleString('es-EC')}<span>${p.op==='Arriendo'?' /mes':''}</span></div>
+      </div>
+      <div class="prop-footer">
+        <span class="badge ${esBadge}">${p.estado}</span>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="toggleFav(${p.id})">${isFav?'💛':'🤍'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleCompare(${p.id})" title="Comparar">${isCmp?'📊✓':'📊'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="abrirDetalle(${p.id})">👁️</button>
+          ${p.estado==='Disponible'?`<button class="btn btn-primary btn-sm" onclick="abrirContacto(${p.id})">📩</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== DETALLE =====
+function abrirDetalle(id){
+  const p=props.find(x=>x.id===id);if(!p)return;
+  const det=document.getElementById('propDetail');det.classList.add('open');
+  const imgDiv=document.getElementById('detailImg');
+  imgDiv.innerHTML=p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" alt="foto"><span id="detailEmoji" style="display:none"></span>`:`<span id="detailEmoji">${EMOJIS[p.tipo]||'🏠'}</span>`;
+  document.getElementById('detailTitulo').textContent=p.titulo;
+  document.getElementById('detailLoc').textContent='📍 '+p.ciudad+(p.dir?' · '+p.dir:'');
+  document.getElementById('detailPrecio').textContent='$'+p.precio.toLocaleString('es-EC')+(p.op==='Arriendo'?' /mes':'');
+  const eb=document.getElementById('detailEstadoBadge');
+  eb.textContent=p.estado;eb.className='badge '+(p.estado==='Disponible'?'b-green':p.estado==='Reservada'?'b-gold':'b-red');
+  const metas=[['🛏️',p.hab,'Habitaciones'],['🚿',p.ban,'Baños'],['📐',p.area,'m²'],['🏷️',p.op,'Operación']].filter(m=>m[1]);
+  document.getElementById('detailMeta').innerHTML=metas.map(m=>`<div class="detail-meta-item"><div class="val">${m[0]} ${m[1]}</div><div class="lbl">${m[2]}</div></div>`).join('');
+  document.getElementById('detailDesc').textContent=p.desc||'Sin descripción.';
+  document.getElementById('detailAgente').textContent=p.agente?'👤 Agente: '+p.agente:'';
+  const isFav=favs.includes(p.id);
+  document.getElementById('detailFavBtn').textContent=isFav?'💛 Quitar favorito':'🤍 Guardar favorito';
+  document.getElementById('detailFavBtn').onclick=()=>{toggleFav(p.id);abrirDetalle(p.id);};
+  document.getElementById('detailContactBtn').onclick=()=>{cerrarDetalle();abrirContacto(p.id);};
+  document.getElementById('detailContactBtn').style.display=p.estado==='Disponible'?'':'none';
+  det.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cerrarDetalle(){document.getElementById('propDetail').classList.remove('open');}
+
+// ===== FAVORITOS =====
+function toggleFav(id){
+  const idx=favs.indexOf(id);
+  if(idx>-1){favs.splice(idx,1);toast('💛 Eliminado de favoritos');}
+  else{favs.push(id);toast('⭐ Guardado en favoritos');}
+  filtrarProps();
+}
+function renderFavs(){
+  const grid=document.getElementById('favGrid');
+  const lista=props.filter(p=>favs.includes(p.id));
+  if(!lista.length){grid.innerHTML='<div class="fav-empty" style="grid-column:1/-1"><div style="font-size:40px;margin-bottom:10px">⭐</div><p>Aún no tienes propiedades guardadas.<br>Haz clic en 🤍 en cualquier propiedad.</p></div>';return;}
+  renderPropGrid(lista);
+  document.getElementById('propGrid');
+  grid.innerHTML=lista.map(p=>{
+    const imgContent=p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" alt="foto">`:`<span style="font-size:44px">${EMOJIS[p.tipo]||'🏠'}</span>`;
+    return `<div class="prop-card favorito">
+      <div class="prop-img" style="position:relative">${imgContent}</div>
+      <div class="prop-body">
+        <div class="prop-title">${p.titulo}</div>
+        <div class="prop-loc">📍 ${p.ciudad}</div>
+        <div class="prop-price">$${p.precio.toLocaleString('es-EC')}</div>
+      </div>
+      <div class="prop-footer">
+        <span class="badge b-green">${p.estado}</span>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-sm" onclick="abrirDetalle(${p.id})">👁️</button>
+          <button class="btn btn-danger btn-sm" onclick="toggleFav(${p.id});renderFavs()">🗑️ Quitar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== COMPARE =====
+function toggleCompare(id){
+  const idx=compareList.indexOf(id);
+  if(idx>-1){compareList.splice(idx,1);toast('Propiedad quitada de comparación');}
+  else{if(compareList.length>=4){toast('⚠️ Máximo 4 propiedades a comparar');return;}compareList.push(id);toast('📊 Propiedad agregada a comparación');}
+  updateComparePanel();filtrarProps();
+}
+function updateComparePanel(){
+  const panel=document.getElementById('comparePanel');
+  const items=document.getElementById('compareItems');
+  if(!compareList.length){panel.classList.remove('open');return;}
+  panel.classList.add('open');
+  items.innerHTML=compareList.map(id=>{const p=props.find(x=>x.id===id);return p?`<div class="compare-chip">${p.titulo}<button onclick="toggleCompare(${id})">✕</button></div>`:''}).join('');
+}
+function limpiarCompare(){compareList=[];updateComparePanel();filtrarProps();}
+function mostrarComparacion(){
+  if(compareList.length<2){toast('⚠️ Selecciona al menos 2 propiedades');return;}
+  const lista=compareList.map(id=>props.find(p=>p.id===id)).filter(Boolean);
+  const fields=[['Título','titulo'],['Tipo','tipo'],['Precio','precio'],['Operación','op'],['Ciudad','ciudad'],['Habitaciones','hab'],['Baños','ban'],['Área (m²)','area'],['Estado','estado'],['Agente','agente']];
+  let html=`<table class="compare-table"><thead><tr><th>Campo</th>${lista.map(p=>`<th>${p.titulo}</th>`).join('')}</tr></thead><tbody>`;
+  fields.forEach(([label,key])=>{
+    html+=`<tr><td class="field-label">${label}</td>${lista.map(p=>{
+      let val=p[key]||'—';
+      if(key==='precio')val='$'+p[key].toLocaleString('es-EC');
+      if(key==='estado'){const c=val==='Disponible'?'b-green':val==='Reservada'?'b-gold':'b-red';val=`<span class="badge ${c}">${val}</span>`;}
+      return `<td>${val}</td>`;
+    }).join('')}</tr>`;
+  });
+  html+='</tbody></table>';
+  document.getElementById('compareTableContent').innerHTML=html;
+  document.getElementById('modalCompare').classList.add('open');
+}
+
+// ===== OPERACIONES =====
+function abrirContacto(propId){
+  const p=props.find(x=>x.id===propId);if(!p)return;
+  contactPropId=propId;
+  document.getElementById('modalPropNombre').value=p.titulo+' — '+p.ciudad;
+  document.getElementById('modalClienteNombre').value=currentUser&&currentUser.rol==='Cliente'?currentUser.nombre:'';
+  document.getElementById('modalClienteEmail').value=currentUser&&currentUser.rol==='Cliente'?currentUser.email:'';
+  document.getElementById('modalContacto').classList.add('open');
+}
+function registrarOperacion(){
+  const nombre=document.getElementById('modalClienteNombre').value.trim();
+  const email=document.getElementById('modalClienteEmail').value.trim();
+  const tipo=document.getElementById('modalTipoInteres').value;
+  if(!nombre||!email){toast('⚠️ Completa nombre y correo');return;}
+  const p=props.find(x=>x.id===contactPropId);
+  ops.push({id:Date.now(),fecha:new Date().toLocaleDateString('es-EC'),propiedad:p?p.titulo:'?',cliente:nombre,email,tipo,estado:'Pendiente'});
+  cerrarModal('modalContacto');renderOps();actualizarInicio();toast('✅ Contacto registrado — Estado: Pendiente');
+}
+function cambiarEstadoOp(id,estado){
+  const o=ops.find(x=>x.id===id);if(o)o.estado=estado;renderOps();
+}
+function renderOps(){
+  const tb=document.getElementById('opsTable');
+  if(!ops.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">📋</div><p>Sin operaciones</p></div></td></tr>';return;}
+  tb.innerHTML=[...ops].reverse().map((o,i)=>`
+    <tr>
+      <td>${ops.length-i}</td><td>${o.fecha}</td><td>${o.propiedad}</td><td>${o.cliente}</td><td>${o.tipo}</td>
+      <td><span class="badge ${o.estado==='Completado'?'b-green':o.estado==='Pendiente'?'b-gold':'b-gray'}">${o.estado}</span></td>
+      <td class="td-actions">
+        <select class="btn btn-ghost btn-sm" onchange="cambiarEstadoOp(${o.id},this.value)" style="cursor:pointer">
+          <option ${o.estado==='Pendiente'?'selected':''}>Pendiente</option>
+          <option ${o.estado==='En proceso'?'selected':''}>En proceso</option>
+          <option ${o.estado==='Completado'?'selected':''}>Completado</option>
+          <option ${o.estado==='Cancelado'?'selected':''}>Cancelado</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+// ===== MAPA =====
+function renderMapa(){
+  const pins=document.getElementById('mapPins');
+  if(!props.length){pins.innerHTML='<div class="empty"><p>Sin propiedades registradas</p></div>';return;}
+  pins.innerHTML=props.map(p=>`
+    <div class="map-pin">
+      <div class="dot" style="background:${p.estado==='Disponible'?'var(--primary)':p.estado==='Reservada'?'var(--gold)':'var(--danger)'}"></div>
+      <div>
+        <strong>${p.titulo}</strong> — ${p.ciudad}${p.dir?' ('+p.dir+')':''}
+        <span class="badge ${p.estado==='Disponible'?'b-green':p.estado==='Reservada'?'b-gold':'b-red'}" style="margin-left:6px">${p.estado}</span>
+      </div>
+      <div style="margin-left:auto;font-weight:600;color:var(--primary)">$${p.precio.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+// ===== PROP TABLE =====
+function renderPropTable(){
+  const tb=document.getElementById('propTable');
+  if(!props.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><p>Sin propiedades</p></div></td></tr>';return;}
+  tb.innerHTML=props.map((p,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${p.titulo}</strong>${p.img?'<span style="font-size:10px;color:var(--primary);margin-left:5px">📷</span>':''}<br><small style="color:var(--text3)">${p.agente||''}</small></td>
+      <td>${EMOJIS[p.tipo]||'🏠'} ${p.tipo}</td>
+      <td>${p.ciudad}</td>
+      <td><strong>$${p.precio.toLocaleString()}</strong></td>
+      <td>${p.op}</td>
+      <td>
+        <select class="badge ${p.estado==='Disponible'?'b-green':p.estado==='Reservada'?'b-gold':'b-red'}" onchange="cambiarEstado(${p.id},this.value)" style="border:none;cursor:pointer;font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px">
+          <option ${p.estado==='Disponible'?'selected':''}>Disponible</option>
+          <option ${p.estado==='Reservada'?'selected':''}>Reservada</option>
+          <option ${p.estado==='Vendida'?'selected':''}>Vendida</option>
+        </select>
+      </td>
+      <td class="td-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editarProp(${p.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarProp(${p.id})">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+// ===== INICIO =====
+function actualizarInicio(){
+  document.getElementById('s1').textContent=props.length;
+  document.getElementById('s2').textContent=props.filter(p=>p.estado==='Disponible').length;
+  document.getElementById('s3').textContent=ACCOUNTS.length+users.length;
+  document.getElementById('s4').textContent=ops.length;
+  const tb=document.getElementById('recentProps');
+  const rec=[...props].reverse().slice(0,5);
+  if(!rec.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><p>Sin propiedades aún</p></div></td></tr>';return;}
+  tb.innerHTML=rec.map(p=>`
+    <tr>
+      <td><strong>${p.titulo}</strong></td><td>${EMOJIS[p.tipo]||''} ${p.tipo}</td>
+      <td>$${p.precio.toLocaleString()}</td>
+      <td><span class="badge ${p.estado==='Disponible'?'b-green':p.estado==='Reservada'?'b-gold':'b-red'}">${p.estado}</span></td>
+    </tr>`).join('');
+}
+
+// ===== REPORTES =====
+function actualizarReportes(){
+  document.getElementById('rTotal').textContent=props.length;
+  document.getElementById('rDisp').textContent=props.filter(p=>p.estado==='Disponible').length;
+  document.getElementById('rReserv').textContent=props.filter(p=>p.estado==='Reservada').length;
+  document.getElementById('rVend').textContent=props.filter(p=>p.estado==='Vendida').length;
+  const tipos={};props.forEach(p=>tipos[p.tipo]=(tipos[p.tipo]||0)+1);
+  renderChart('chartTipo',tipos);
+  const opsMap={};props.forEach(p=>opsMap[p.op]=(opsMap[p.op]||0)+1);
+  renderChart('chartOp',opsMap);
+  const allU=[...ACCOUNTS,...users];const roles={};allU.forEach(u=>roles[u.rol]=(roles[u.rol]||0)+1);
+  renderChart('chartRol',roles);
+  const tb=document.getElementById('reportOps');
+  const rec=[...ops].reverse().slice(0,5);
+  if(!rec.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><p>Sin operaciones</p></div></td></tr>';return;}
+  tb.innerHTML=rec.map(o=>`<tr><td>${o.fecha}</td><td>${o.propiedad}</td><td>${o.cliente}</td><td>${o.tipo}</td><td><span class="badge ${o.estado==='Completado'?'b-green':'b-gold'}">${o.estado}</span></td></tr>`).join('');
+}
+function renderChart(id,data){
+  const el=document.getElementById(id);const keys=Object.keys(data);
+  if(!keys.length){el.innerHTML='<div class="empty"><p>Sin datos</p></div>';return;}
+  const max=Math.max(...Object.values(data));
+  el.innerHTML=keys.map((k,i)=>{const v=data[k];const pct=max?Math.round(v/max*100):0;
+    return `<div class="chart-bar-row"><div class="chart-bar-label">${k}</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${pct}%;background:${BAR_COLORS[i%BAR_COLORS.length]}">${v>0?v:''}</div></div><div class="chart-bar-val">${v}</div></div>`;
+  }).join('');
+}
+
+// ===== DEMO DATA =====
+function cargarDemo(){
+  props=[
+    {id:101,titulo:'Casa moderna en urb. La Arboleda',tipo:'Casa',precio:95000,op:'Venta',ciudad:'Milagro',dir:'Mz 5 Sl 3',hab:3,ban:2,area:140,agente:'Carlos Mendoza',desc:'Casa de dos pisos con jardín, garaje y área social. Urbanización cerrada con seguridad 24h.',img:'',estado:'Disponible',fecha:'01/06/2026'},
+    {id:102,titulo:'Departamento amoblado Kennedy',tipo:'Departamento',precio:550,op:'Arriendo',ciudad:'Guayaquil',dir:'Kennedy Norte, Ed. Torre Azul',hab:2,ban:1,area:75,agente:'Admin Sistema',desc:'Departamento totalmente amoblado con vista a la ciudad. Incluye todos los servicios básicos.',img:'',estado:'Disponible',fecha:'03/06/2026'},
+    {id:103,titulo:'Terreno en zona comercial Durán',tipo:'Terreno',precio:45000,op:'Venta',ciudad:'Durán',dir:'Av. León Febres Cordero',hab:0,ban:0,area:300,agente:'Carlos Mendoza',desc:'Terreno plano con todos los servicios básicos. Ideal para construcción comercial.',img:'',estado:'Reservada',fecha:'10/06/2026'},
+    {id:104,titulo:'Local comercial centro Milagro',tipo:'Local comercial',precio:800,op:'Arriendo',ciudad:'Milagro',dir:'Calle García Moreno y 12 de Febrero',hab:0,ban:1,area:60,agente:'Carlos Mendoza',desc:'Local con vitrina amplia, cuarto de bodega y baño. Ideal para negocio de ropa o electrónica.',img:'',estado:'Disponible',fecha:'15/06/2026'},
+    {id:105,titulo:'Casa familiar con piscina',tipo:'Casa',precio:165000,op:'Venta',ciudad:'Guayaquil',dir:'Urb. Los Ceibos, Av. Principal',hab:4,ban:3,area:240,agente:'Admin Sistema',desc:'Exclusiva casa en urbanización cerrada. Amplio jardín, piscina y BBQ. Sector exclusivo.',img:'',estado:'Disponible',fecha:'20/06/2026'},
+  ];
+  ops=[
+    {id:1001,fecha:'10/06/2026',propiedad:'Casa moderna en urb. La Arboleda',cliente:'Luis Pérez',email:'luis@inmo.ec',tipo:'Compra',estado:'Pendiente'},
+    {id:1002,fecha:'12/06/2026',propiedad:'Terreno en zona comercial Durán',cliente:'Ana Suárez',email:'ana@email.com',tipo:'Compra',estado:'Completado'},
+  ];
+  actualizarSelectAgentes();
+}
+
+cargarDemo();
+</script>
+</body>
+</html>
