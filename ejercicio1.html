@@ -3,93 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>control de inventario</title>
+    <title>Control de Inventario</title>
 </head>
 <body>
-    <table border="1">
-        <thead>
+    <table border="">
+        <th colspan="4">
             <tr>
-                <td colspan="4" align="center" bgcolor="#cccccc">control de inventario</td>
+                <td colspan="5" align="center">Control de Inventario</td>
             </tr>
-        </thead>
+        </th>
         <tbody>
             <tr>
-                <td>Precio:</td>
-                <td><input type="number" id="txtPrecio" step="any"></td>
-                <td>Tope: 6</td>
-                <td><button id="btnAgregar">Agregar Precio</button></td>
+                <td>Precio</td>
+                <td><input type="number" id="txt-precio"></td>
+                <td>Tope: 6 </td>
+                <td>
+                    <button type="" id="btn-agregar-precio">agregar</button>
+                </td>
             </tr>
             <tr>
                 <td></td>
-                <td><textarea id="txtListado" rows="9" cols="30" placeholder="listado de precios" readonly></textarea></td>
-                <td><button id="btnPresentar">Presentar</button></td>
-                <td><button id="btnCargar">Cargar Precios</button></td>
+                <td>
+                    <textarea name="" id="txt-listado-precios" placeholder="listado de precios" rows="5"  readonly ></textarea>
+                </td>
+                <td>
+                    <button type="" id="btn-presentar-precios">Presentar</button>
+                </td>
+                <td>
+                    <button type="" id="btn-cargar-precios" align="center">Cargar precios</button>
+                </td>
+                </td>
             </tr>
             <tr>
-                <td>Total Inv. $</td>
-                <td><input type="text" id="txtTotal" placeholder="$0.00" readonly></td>
-                <td><button id="btnCalcular">Calcular Total</button></td>
+                <td>Total Inv</td>
+                <td>
+                    <input type="text" readonly placeholder="$0.00" id="txt-total-inventario">
+                </td>
+                <td>
+                    <button id="btn-calcular-total" type="">Calcular total</button>
+                </td>
                 <td></td>
             </tr>
         </tbody>
     </table>
 
     <script>
-        // Vector donde se guardan los precios (maximo 6)
-        let precios = [];
+        //
+        const txtPrecio = document.getElementById('txt-precio');
+        const btnAgregarPrecio = document.getElementById('btn-agregar-precio');
+
+        const txtlistadoPrecio = document.getElementById('txt-listado-precios')
+        const btnPresentarPrecio = document.getElementById('btn-presentar-precios')
+        
+        const txtTotalInventario = document.getElementById('txt-total-inventario');
+        const btnCalcularTotal = document.getElementById('btn-calcular-total');
+
+        
         const TOPE = 6;
-        const productos = ["Arroz", "Azucar", "Leche", "Pan", "Aceite", "Huevos"];
+        // Definir el vector
+        let productos = []; // new Array()
+        
+        //Agregar evento escuchador Click agregar
+        btnAgregarPrecio.addEventListener('click', function(e){
+            // Extraer precio de la caja de texto
+            const precio = parseFloat(txtPrecio.value);
+            //Calcular la cantidad de elementos del vector
+            const cantElementos = productos.length;
+            // Mientras cantElementos sea menor al TOPE=6 continuo agregando precios
+            if(cantElementos < TOPE){
+                const indice = cantElementos;
+                //Asignar o agregar el nuevo precio
+                productos[indice] = precio;
+                // presentar por consola el vector
+                console.log('productos:', productos);
+                txtPrecio.value = '';
+                
+            }
+            else{
+                alert('Ya no se puede ingresar precios..')
+            };
+        })
 
-        // Guarda el dato escrito en el vector
-        function agregarPrecio() {
-            let valor = parseFloat(document.getElementById("txtPrecio").value);
-            if (isNaN(valor) || valor < 0) {
-                alert("Ingrese un precio valido");
-                return;
+        // agregar evento escuychador click presentar
+        btnPresentarPrecio.addEventListener('click', function(e){
+            //borramos datos en la caja de texto
+            txtlistadoPrecio.value = '';
+            //txtlistadoPrecio.value = productos.join('\n')
+            for(let i = 0; i < productos.length; i++){
+                // agregamos valores a la caja de texto
+                txtlistadoPrecio.value += productos[i] + '\n' 
             }
-            if (precios.length >= TOPE) {
-                alert("Ya ingreso los 6 precios");
-                return;
+        })
+    
+        btnCalcularTotal.addEventListener('click', function(e){
+            txtTotalInventario.value = fnCalcularTotal().toFixed(2)
+        })
+
+        function fnCalcularTotal(){
+            let totalInventario = 0 // acumulador
+
+            for(let i = 0; i < productos.length; i++){
+                totalInventario = totalInventario + productos[i]
             }
-            precios.push(valor);
-            document.getElementById("txtPrecio").value = "";
+            return totalInventario;
         }
 
-        // Llena el vector con datos de ejemplo usando un for
-        function cargarPrecios() {
-            let ejemplo = [1.25, 0.90, 1.10, 0.35, 3.50, 0.15];
-            precios = [];
-            for (let i = 0; i < TOPE; i++) {
-                precios.push(ejemplo[i]);
-            }
-        }
-
-        // FOR 1: recorre el vector y arma el listado
-        function presentar() {
-            let texto = "";
-            for (let i = 0; i < precios.length; i++) {
-                texto += productos[i] + ": $" + precios[i].toFixed(2) + "\n";
-            }
-            document.getElementById("txtListado").value = texto;
-        }
-
-        // FOR 2: recorre el vector y va sumando cada precio
-        function calcularTotal() {
-            if (precios.length < TOPE) {
-                alert("Faltan precios: ingrese los 6 productos");
-                return;
-            }
-            let total = 0;
-            for (let i = 0; i < precios.length; i++) {
-                total = total + precios[i];
-            }
-            document.getElementById("txtTotal").value = "$" + total.toFixed(2);
-        }
-
-        document.getElementById("btnAgregar").addEventListener("click", agregarPrecio);
-        document.getElementById("btnPresentar").addEventListener("click", presentar);
-        document.getElementById("btnCargar").addEventListener("click", cargarPrecios);
-        document.getElementById("btnCalcular").addEventListener("click", calcularTotal);
     </script>
 </body>
 </html>
