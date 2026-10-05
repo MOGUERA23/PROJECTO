@@ -3,113 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>promedio de calificaciones</title>
+    <title>Document</title>
 </head>
 <body>
-    <table border="1">
-        <thead>
-            <tr>
-                <td colspan="4" align="center" bgcolor="#cccccc">promedio de calificaciones</td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Nota:</td>
-                <td><input type="number" id="txtNota" step="any"></td>
-                <td>Tope: 12</td>
-                <td><button id="btnAgregar">Agregar Nota</button></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><textarea id="txtListado" rows="9" cols="30" placeholder="listado de notas" readonly></textarea></td>
-                <td><button id="btnPresentar">Presentar</button></td>
-                <td><button id="btnCargar">Cargar Notas</button></td>
-            </tr>
-            <tr>
-                <td>Promedio</td>
-                <td><input type="text" id="txtPromedio" placeholder="0.00" readonly></td>
-                <td><button id="btnCalcular">Calcular</button></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Aprobados</td>
-                <td><input type="text" id="txtAprobados" readonly></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Reprobados</td>
-                <td><input type="text" id="txtReprobados" readonly></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
+    <table border="">
+    <th colspan="4">
+        <tr>
+            <td colspan="4" align="center">Promedio de Calificaciones</td>
+        </tr>
+    </th>
+    <tbody>
+        <tr>
+            <td>Nota</td>
+            <td>
+                <input type="number" id="txt-nota" placeholder="Ingrese nota: 0 a 10">
+            </td>
+            <td>Tope: 12 estudiantes</td>
+            <td>
+                <button type="" id="btn-agregar-nota">Agregar</button>
+            </td>
+        </tr>
 
-    <script>
-        // Vector donde se guardan las notas (maximo 12)
-        let notas = [];
-        const TOPE = 12;
+        <tr>
+            <td>Listado de notas</td>
+            <td>
+                <textarea
+                    id="txt-listado-notas"
+                    placeholder="Listado de notas"
+                    rows="6"
+                    readonly>
+                </textarea>
+            </td>
+            <td>
+                <button type="" id="btn-presentar-notas">
+                    Presentar
+                </button>
+            </td>
+        </tr>
 
-        // Guarda el dato escrito en el vector
-        function agregarNota() {
-            let valor = parseFloat(document.getElementById("txtNota").value);
-            if (isNaN(valor) || valor < 0 || valor > 10) {
-                alert("La nota debe estar entre 0 y 10");
-                return;
-            }
-            if (notas.length >= TOPE) {
-                alert("Ya ingreso las 12 notas");
-                return;
-            }
-            notas.push(valor);
-            document.getElementById("txtNota").value = "";
+        <tr>
+            <td>Promedio</td>
+            <td>
+                <input
+                    type="text"
+                    readonly
+                    placeholder="0.00"
+                    id="txt-promedio">
+            </td>
+            <td>
+                <button id="btn-calcular-promedio" type="">
+                    Calcular promedio
+                </button>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Aprobados</td>
+            <td>
+                <input
+                    type="text"
+                    readonly
+                    placeholder="0"
+                    id="txt-aprobados">
+            </td>
+            <td>Nota mínima: 7</td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Reprobados</td>
+            <td>
+                <input
+                    type="text"
+                    readonly
+                    placeholder="0"
+                    id="txt-reprobados">
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+    </tbody>
+</table>
+<script>
+    const txtNota = document.getElementById('txt-nota');
+    const btnAgregarNota = document.getElementById('btn-agregar-nota');
+
+    const txtListadoNotas = document.getElementById('txt-listado-notas');
+    const btnPresentarNotas = document.getElementById('btn-presentar-notas');
+
+    const txtPromedio = document.getElementById('txt-promedio');
+    const btnCalcularPromedio = document.getElementById('btn-calcular-promedio');
+
+    const txtAprobados = document.getElementById('txt-aprobados');
+    const txtReprobados = document.getElementById('txt-reprobados');
+
+    const TOPE = 12;
+    let notas = [];
+    btnAgregarNota.addEventListener('click', function(e){
+        const nota = parseFloat(txtNota.value);
+        const cantNotas = notas.length;
+
+        if(cantNotas < TOPE){
+            const indice = cantNotas;
+            notas[indice] = nota;
+            console.log('notas: ', notas);
+            txtNota.value = '';
         }
+        else{
+            alert('Ingresar solo 12 notas');
+        };
+    } );
 
-        // Llena el vector con datos de ejemplo usando un for
-        function cargarNotas() {
-            let ejemplo = [8, 6.5, 9, 7, 5, 10, 4, 7.5, 8.5, 6, 9.5, 7];
-            notas = [];
-            for (let i = 0; i < TOPE; i++) {
-                notas.push(ejemplo[i]);
+    btnPresentarNotas.addEventListener('click', function(e){
+        txtListadoNotas.value = '';
+        for(let i = 0; i < notas.length; i++){
+            txtListadoNotas.value += notas[i] + '\n';
+        };
+    });
+
+    btnCalcularPromedio.addEventListener('click', function(e){
+        txtPromedio.value = promedio().toFixed(2);
+    });
+    function promedio(){
+        let total = 0;
+        let aprobados = 0;
+        let reprobados = 0;
+        for(let i = 0; i < notas.length; i++){
+            total = total + notas[i]
+            if(notas[i] < 7){
+                reprobados ++;
+            }else{
+                aprobados++;
             }
         }
+        txtAprobados.value = aprobados;
+        txtReprobados.value = reprobados;
+        return total/notas.length;
+        
+    };
 
-        // FOR 1: recorre el vector y arma el listado
-        function presentar() {
-            let texto = "";
-            for (let i = 0; i < notas.length; i++) {
-                texto += "Estudiante " + (i + 1) + ": " + notas[i] + "\n";
-            }
-            document.getElementById("txtListado").value = texto;
-        }
-
-        // FOR 2: suma las notas y cuenta aprobados (>= 7) y reprobados
-        function calcular() {
-            if (notas.length < TOPE) {
-                alert("Faltan notas: ingrese las 12");
-                return;
-            }
-            let suma = 0;
-            let aprobados = 0;
-            let reprobados = 0;
-            for (let i = 0; i < notas.length; i++) {
-                suma = suma + notas[i];
-                if (notas[i] >= 7) {
-                    aprobados++;
-                } else {
-                    reprobados++;
-                }
-            }
-            document.getElementById("txtPromedio").value = (suma / notas.length).toFixed(2);
-            document.getElementById("txtAprobados").value = aprobados;
-            document.getElementById("txtReprobados").value = reprobados;
-        }
-
-        document.getElementById("btnAgregar").addEventListener("click", agregarNota);
-        document.getElementById("btnPresentar").addEventListener("click", presentar);
-        document.getElementById("btnCargar").addEventListener("click", cargarNotas);
-        document.getElementById("btnCalcular").addEventListener("click", calcular);
-    </script>
+</script>
 </body>
 </html>
