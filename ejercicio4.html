@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>analisis de ventas</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <td colspan="4" align="center" bgcolor="#cccccc">analisis de ventas - boutique</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Venta $:</td>
+                <td><input type="number" id="txtVenta" step="any"></td>
+                <td>Tope: 15</td>
+                <td><button id="btnAgregar">Agregar Venta</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><textarea id="txtListado" rows="9" cols="30" placeholder="listado de ventas" readonly></textarea></td>
+                <td><button id="btnPresentar">Presentar</button></td>
+                <td><button id="btnCargar">Cargar Ventas</button></td>
+            </tr>
+            <tr>
+                <td>Venta mayor</td>
+                <td><input type="text" id="txtMayor" readonly></td>
+                <td><button id="btnCalcular">Calcular</button></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Venta menor</td>
+                <td><input type="text" id="txtMenor" readonly></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Vector donde se guardan las ventas (15 dias)
+        let ventas = [];
+        const TOPE = 15;
+
+        // Guarda el dato escrito en el vector
+        function agregarVenta() {
+            let valor = parseFloat(document.getElementById("txtVenta").value);
+            if (isNaN(valor) || valor < 0) {
+                alert("Ingrese una venta valida");
+                return;
+            }
+            if (ventas.length >= TOPE) {
+                alert("Ya ingreso las 15 ventas");
+                return;
+            }
+            ventas.push(valor);
+            document.getElementById("txtVenta").value = "";
+        }
+
+        // Llena el vector con datos de ejemplo usando un for
+        function cargarVentas() {
+            let ejemplo = [120, 85, 200, 150, 95, 310, 70, 180, 220, 130, 60, 250, 175, 140, 90];
+            ventas = [];
+            for (let i = 0; i < TOPE; i++) {
+                ventas.push(ejemplo[i]);
+            }
+        }
+
+        // FOR 1: recorre el vector y arma el listado
+        function presentar() {
+            let texto = "";
+            for (let i = 0; i < ventas.length; i++) {
+                texto += "Dia " + (i + 1) + ": $" + ventas[i].toFixed(2) + "\n";
+            }
+            document.getElementById("txtListado").value = texto;
+        }
+
+        // FOR 2: busca la venta mayor y la menor con su dia
+        function calcular() {
+            if (ventas.length < TOPE) {
+                alert("Faltan ventas: ingrese las 15");
+                return;
+            }
+            let mayor = ventas[0];
+            let diaMayor = 1;
+            let menor = ventas[0];
+            let diaMenor = 1;
+            for (let i = 1; i < ventas.length; i++) {
+                if (ventas[i] > mayor) {
+                    mayor = ventas[i];
+                    diaMayor = i + 1;
+                }
+                if (ventas[i] < menor) {
+                    menor = ventas[i];
+                    diaMenor = i + 1;
+                }
+            }
+            document.getElementById("txtMayor").value = "$" + mayor.toFixed(2) + " (Dia " + diaMayor + ")";
+            document.getElementById("txtMenor").value = "$" + menor.toFixed(2) + " (Dia " + diaMenor + ")";
+        }
+
+        document.getElementById("btnAgregar").addEventListener("click", agregarVenta);
+        document.getElementById("btnPresentar").addEventListener("click", presentar);
+        document.getElementById("btnCargar").addEventListener("click", cargarVentas);
+        document.getElementById("btnCalcular").addEventListener("click", calcular);
+    </script>
+</body>
+</html>

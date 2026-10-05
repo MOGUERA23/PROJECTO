@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>control de inventario</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <td colspan="4" align="center" bgcolor="#cccccc">control de inventario</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Precio:</td>
+                <td><input type="number" id="txtPrecio" step="any"></td>
+                <td>Tope: 6</td>
+                <td><button id="btnAgregar">Agregar Precio</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><textarea id="txtListado" rows="9" cols="30" placeholder="listado de precios" readonly></textarea></td>
+                <td><button id="btnPresentar">Presentar</button></td>
+                <td><button id="btnCargar">Cargar Precios</button></td>
+            </tr>
+            <tr>
+                <td>Total Inv. $</td>
+                <td><input type="text" id="txtTotal" placeholder="$0.00" readonly></td>
+                <td><button id="btnCalcular">Calcular Total</button></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Vector donde se guardan los precios (maximo 6)
+        let precios = [];
+        const TOPE = 6;
+        const productos = ["Arroz", "Azucar", "Leche", "Pan", "Aceite", "Huevos"];
+
+        // Guarda el dato escrito en el vector
+        function agregarPrecio() {
+            let valor = parseFloat(document.getElementById("txtPrecio").value);
+            if (isNaN(valor) || valor < 0) {
+                alert("Ingrese un precio valido");
+                return;
+            }
+            if (precios.length >= TOPE) {
+                alert("Ya ingreso los 6 precios");
+                return;
+            }
+            precios.push(valor);
+            document.getElementById("txtPrecio").value = "";
+        }
+
+        // Llena el vector con datos de ejemplo usando un for
+        function cargarPrecios() {
+            let ejemplo = [1.25, 0.90, 1.10, 0.35, 3.50, 0.15];
+            precios = [];
+            for (let i = 0; i < TOPE; i++) {
+                precios.push(ejemplo[i]);
+            }
+        }
+
+        // FOR 1: recorre el vector y arma el listado
+        function presentar() {
+            let texto = "";
+            for (let i = 0; i < precios.length; i++) {
+                texto += productos[i] + ": $" + precios[i].toFixed(2) + "\n";
+            }
+            document.getElementById("txtListado").value = texto;
+        }
+
+        // FOR 2: recorre el vector y va sumando cada precio
+        function calcularTotal() {
+            if (precios.length < TOPE) {
+                alert("Faltan precios: ingrese los 6 productos");
+                return;
+            }
+            let total = 0;
+            for (let i = 0; i < precios.length; i++) {
+                total = total + precios[i];
+            }
+            document.getElementById("txtTotal").value = "$" + total.toFixed(2);
+        }
+
+        document.getElementById("btnAgregar").addEventListener("click", agregarPrecio);
+        document.getElementById("btnPresentar").addEventListener("click", presentar);
+        document.getElementById("btnCargar").addEventListener("click", cargarPrecios);
+        document.getElementById("btnCalcular").addEventListener("click", calcularTotal);
+    </script>
+</body>
+</html>

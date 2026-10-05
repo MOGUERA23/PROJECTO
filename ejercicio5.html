@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>consulta de saldos</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <td colspan="4" align="center" bgcolor="#cccccc">consulta de saldos - Banco Mi Futuro</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Saldo $:</td>
+                <td><input type="number" id="txtSaldo" step="any"></td>
+                <td>Tope: 10</td>
+                <td><button id="btnAgregar">Agregar Saldo</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><textarea id="txtListado" rows="9" cols="30" placeholder="listado de saldos" readonly></textarea></td>
+                <td><button id="btnPresentar">Presentar</button></td>
+                <td><button id="btnCargar">Cargar Saldos</button></td>
+            </tr>
+            <tr>
+                <td>Cuenta N°</td>
+                <td><input type="number" id="txtCuenta" placeholder="1 a 10"></td>
+                <td><button id="btnConsultar">Consultar</button></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Resultado</td>
+                <td colspan="3"><input type="text" id="txtResultado" size="40" readonly></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Vector donde se guardan los saldos (10 clientes)
+        let saldos = [];
+        const TOPE = 10;
+
+        // Guarda el dato escrito en el vector
+        function agregarSaldo() {
+            let valor = parseFloat(document.getElementById("txtSaldo").value);
+            if (isNaN(valor) || valor < 0) {
+                alert("Ingrese un saldo valido");
+                return;
+            }
+            if (saldos.length >= TOPE) {
+                alert("Ya ingreso los 10 saldos");
+                return;
+            }
+            saldos.push(valor);
+            document.getElementById("txtSaldo").value = "";
+        }
+
+        // Llena el vector con datos de ejemplo usando un for
+        function cargarSaldos() {
+            let ejemplo = [500, 1200.5, 75, 3000, 450, 980, 15, 2200, 640, 1800];
+            saldos = [];
+            for (let i = 0; i < TOPE; i++) {
+                saldos.push(ejemplo[i]);
+            }
+        }
+
+        // FOR 1: recorre el vector y arma el listado
+        function presentar() {
+            let texto = "";
+            for (let i = 0; i < saldos.length; i++) {
+                texto += "Cuenta " + (i + 1) + ": $" + saldos[i].toFixed(2) + "\n";
+            }
+            document.getElementById("txtListado").value = texto;
+        }
+
+        // FOR 2: busca la cuenta (numero de cuenta = posicion + 1)
+        function consultar() {
+            if (saldos.length < TOPE) {
+                alert("Faltan saldos: ingrese los 10");
+                return;
+            }
+            let cuenta = parseInt(document.getElementById("txtCuenta").value);
+            let resultado = "ERROR: la cuenta no esta registrada";
+            for (let i = 0; i < saldos.length; i++) {
+                if (i + 1 === cuenta) {
+                    resultado = "Cuenta " + cuenta + " - Saldo: $" + saldos[i].toFixed(2);
+                }
+            }
+            document.getElementById("txtResultado").value = resultado;
+        }
+
+        document.getElementById("btnAgregar").addEventListener("click", agregarSaldo);
+        document.getElementById("btnPresentar").addEventListener("click", presentar);
+        document.getElementById("btnCargar").addEventListener("click", cargarSaldos);
+        document.getElementById("btnConsultar").addEventListener("click", consultar);
+    </script>
+</body>
+</html>

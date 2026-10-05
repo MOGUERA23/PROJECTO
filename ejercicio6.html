@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fibonacci</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <td colspan="2" align="center" bgcolor="#cccccc">fibonacci con mas de 1000 divisores</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><button id="btnBuscar">Buscar</button></td>
+                <td><textarea id="txtResultado" rows="5" cols="40" placeholder="resultado (tarda unos segundos)" readonly></textarea></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Cuenta cuantos divisores tiene el numero n
+        function contarDivisores(n) {
+            let cantidad = 0;
+            // Solo se recorre hasta la raiz cuadrada: cada divisor i tiene un par n / i
+            for (let i = 1; i * i <= n; i++) {
+                if (n % i === 0) {
+                    cantidad++;
+                    if (i !== n / i) {
+                        cantidad++;
+                    }
+                }
+            }
+            return cantidad;
+        }
+
+        // Recorre la serie de Fibonacci hasta encontrar el primero con mas de 1000 divisores
+        function buscar() {
+            let a = 1;   // termino actual (F1)
+            let b = 1;   // termino siguiente (F2)
+            let resultado = "";
+            for (let posicion = 1; ; posicion++) {
+                let divisores = contarDivisores(a);
+                if (divisores > 1000) {
+                    resultado = "Posicion: " + posicion + "\n" +
+                                "Numero de Fibonacci: " + a + "\n" +
+                                "Divisores: " + divisores;
+                    break;
+                }
+                let siguiente = a + b;
+                a = b;
+                b = siguiente;
+            }
+            document.getElementById("txtResultado").value = resultado;
+        }
+
+        document.getElementById("btnBuscar").addEventListener("click", buscar);
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>temperaturas semanales</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <td colspan="4" align="center" bgcolor="#cccccc">temperaturas semanales - Manta</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Temp. C:</td>
+                <td><input type="number" id="txtTemp" step="any"></td>
+                <td>Tope: 7</td>
+                <td><button id="btnAgregar">Agregar Temp.</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><textarea id="txtListado" rows="9" cols="30" placeholder="listado de temperaturas" readonly></textarea></td>
+                <td><button id="btnPresentar">Presentar</button></td>
+                <td><button id="btnCargar">Cargar Temp.</button></td>
+            </tr>
+            <tr>
+                <td>Promedio</td>
+                <td><input type="text" id="txtPromedio" placeholder="0.00" readonly></td>
+                <td><button id="btnCalcular">Calcular</button></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Dias sobre el promedio</td>
+                <td><textarea id="txtSuperan" rows="4" cols="30" readonly></textarea></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Vector donde se guardan las temperaturas (7 dias)
+        let temperaturas = [];
+        const TOPE = 7;
+        const dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
+
+        // Guarda el dato escrito en el vector
+        function agregarTemp() {
+            let valor = parseFloat(document.getElementById("txtTemp").value);
+            if (isNaN(valor)) {
+                alert("Ingrese una temperatura valida");
+                return;
+            }
+            if (temperaturas.length >= TOPE) {
+                alert("Ya ingreso las 7 temperaturas");
+                return;
+            }
+            temperaturas.push(valor);
+            document.getElementById("txtTemp").value = "";
+        }
+
+        // Llena el vector con datos de ejemplo usando un for
+        function cargarTemp() {
+            let ejemplo = [28, 30, 27, 31, 33, 29, 26];
+            temperaturas = [];
+            for (let i = 0; i < TOPE; i++) {
+                temperaturas.push(ejemplo[i]);
+            }
+        }
+
+        // FOR 1: recorre el vector y arma el listado
+        function presentar() {
+            let texto = "";
+            for (let i = 0; i < temperaturas.length; i++) {
+                texto += dias[i] + ": " + temperaturas[i] + " C\n";
+            }
+            document.getElementById("txtListado").value = texto;
+        }
+
+        // FOR 2: calcula el promedio. FOR 3: busca los dias que lo superan
+        function calcular() {
+            if (temperaturas.length < TOPE) {
+                alert("Faltan temperaturas: ingrese las 7");
+                return;
+            }
+            let suma = 0;
+            for (let i = 0; i < temperaturas.length; i++) {
+                suma = suma + temperaturas[i];
+            }
+            let promedio = suma / temperaturas.length;
+
+            let texto = "";
+            for (let i = 0; i < temperaturas.length; i++) {
+                if (temperaturas[i] > promedio) {
+                    texto += dias[i] + ": " + temperaturas[i] + " C\n";
+                }
+            }
+            if (texto === "") {
+                texto = "Ningun dia supero el promedio";
+            }
+            document.getElementById("txtPromedio").value = promedio.toFixed(2) + " C";
+            document.getElementById("txtSuperan").value = texto;
+        }
+
+        document.getElementById("btnAgregar").addEventListener("click", agregarTemp);
+        document.getElementById("btnPresentar").addEventListener("click", presentar);
+        document.getElementById("btnCargar").addEventListener("click", cargarTemp);
+        document.getElementById("btnCalcular").addEventListener("click", calcular);
+    </script>
+</body>
+</html>
