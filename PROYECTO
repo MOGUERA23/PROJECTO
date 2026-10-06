@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Inventario</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <td colspan="4" align="center">Control de Inventario</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Precio</td>
+                <td><input type="number" id="txt-precio" step="any"></td>
+                <td>Tope: 6</td>
+                <td>
+                    <button id="btn-agregar-precio">Agregar</button>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <textarea id="txt-listado-precios" placeholder="listado de precios" rows="7" readonly></textarea>
+                </td>
+                <td>
+                    <button id="btn-presentar-precios">Presentar</button>
+                </td>
+                <td>
+                    <button id="btn-cargar-precios">Cargar precios</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Total Inv</td>
+                <td>
+                    <input type="text" readonly placeholder="$0.00" id="txt-total-inventario">
+                </td>
+                <td>
+                    <button id="btn-calcular-total">Calcular total</button>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+      
+        const txtPrecio = document.getElementById('txt-precio');
+        const btnAgregarPrecio = document.getElementById('btn-agregar-precio');
+
+        const txtListadoPrecios = document.getElementById('txt-listado-precios');
+        const btnPresentarPrecios = document.getElementById('btn-presentar-precios');
+        const btnCargarPrecios = document.getElementById('btn-cargar-precios');
+
+        const txtTotalInventario = document.getElementById('txt-total-inventario');
+        const btnCalcularTotal = document.getElementById('btn-calcular-total');
+
+        const TOPE = 6;
+      
+        let precios = []; 
+
+    
+        btnAgregarPrecio.addEventListener('click', function(e){
+       
+            const precio = parseFloat(txtPrecio.value);
+       
+            if(isNaN(precio) || precio < 0){
+                alert('Ingrese un precio valido');
+                return;
+            }
+          
+            const cantElementos = precios.length;
+         
+            if(cantElementos < TOPE){
+                const indice = cantElementos;
+             
+                precios[indice] = precio;
+             
+                console.log('precios:', precios);
+                txtPrecio.value = '';
+            }
+            else{
+                alert('Ya no se puede ingresar precios..');
+            }
+        })
+
+       
+        btnPresentarPrecios.addEventListener('click', function(e){
+         
+            txtListadoPrecios.value = '';
+            for(let i = 0; i < precios.length; i++){
+          
+                txtListadoPrecios.value += precios[i] + '\n';
+            }
+        })
+
+ 
+        btnCargarPrecios.addEventListener('click', function(e){
+            const ejemplo = [1.25, 0.90, 1.10, 0.35, 3.50, 0.15];
+            precios = [];
+            for(let i = 0; i < TOPE; i++){
+                precios[i] = ejemplo[i];
+            }
+            console.log('precios:', precios);
+        })
+
+
+        btnCalcularTotal.addEventListener('click', function(e){
+            if(precios.length < TOPE){
+                alert('Faltan precios: ingrese los 6 productos');
+                return;
+            }
+            txtTotalInventario.value = '$' + fnCalcularTotal().toFixed(2);
+        })
+
+        function fnCalcularTotal(){
+            let totalInventario = 0; 
+            for(let i = 0; i < precios.length; i++){
+                totalInventario = totalInventario + precios[i];
+            }
+            return totalInventario;
+        }
+    </script>
+</body>
+</html>
